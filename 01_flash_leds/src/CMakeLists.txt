@@ -1,0 +1,5 @@
+add_executable(01_flash_all_leds 01_flash_all_leds.c)
+
+target_link_libraries(01_flash_all_leds pico_stdlib)
+
+pico_add_extra_outputs(01_flash_all_leds)
