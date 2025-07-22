@@ -4,12 +4,12 @@
 
 Make sure, that pico-sdk and picotool are cloned and checked out as well:
 ```
-  git clone --recurse https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_arm.git
+git clone --recurse https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_arm.git
 ```
 
 In case you forgot to recursively checkout the sub-modules (i.e. pico-sdk), do this afterwards:
 ```
-  git submodule update --init
+git submodule update --init
 ```
 
 XXXXX FIX ME:
