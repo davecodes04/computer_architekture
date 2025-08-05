@@ -1,1 +1,2 @@
-add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/lcd ${CMAKE_CURRENT_BINARY_DIR}/lcd)
+add_subdirectory(Config)
+add_subdirectory(lcd)
