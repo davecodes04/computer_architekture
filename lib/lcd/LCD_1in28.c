@@ -12,9 +12,9 @@
 *
 ******************************************************************************/
 #include "LCD_1in28.h"
-#include "Config/DEV_Config.h"
+#include "DEV_Config.h"
 
-#include <stdlib.h>
+#include <stdlib.h>		//itoa()
 #include <stdio.h>
 
 LCD_1IN28_ATTRIBUTES LCD_1IN28;
