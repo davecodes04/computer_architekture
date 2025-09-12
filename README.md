@@ -4,7 +4,7 @@
 
 Make sure, that pico-sdk and picotool are cloned and checked out as well:
 
-  git submodule update --init
+  git submodule update --init --recursive
 
 
 XXXXX FIX ME:
