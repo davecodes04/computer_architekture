@@ -1,10 +1,10 @@
-add_executable(lcd_display lcd_display.c)
+add_executable(${CMAKE_PROJECT_NAME} lcd_display.c)
 
-target_include_directories(lcd_display PUBLIC ../../lib)
-target_link_libraries(lcd_display pico_stdlib Config lcd)
+target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ../../lib)
+target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib Config lcd)
 
 # Create map/bin/hex/uf2 file in addition to ELF.
-pico_add_extra_outputs(lcd_display)
+pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
 
 # Additionally enable the USB port for stdio (printf) use serial console to access
-pico_enable_stdio_usb(lcd_display 1)
+pico_enable_stdio_usb(${CMAKE_PROJECT_NAME} 1)
