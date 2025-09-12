@@ -1,4 +1,4 @@
-# Computerarchitektur_ARM
+# Software Repository for Lecture Computerarchitektur
 
 ## Getting started
 
@@ -9,7 +9,7 @@ git clone --recurse https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_
 
 In case you forgot to recursively checkout the sub-modules (i.e. pico-sdk), do this afterwards:
 ```
-git submodule update --init
+  git submodule update --init --recursive
 ```
 
 XXXXX FIX ME:
