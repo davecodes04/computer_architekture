@@ -10,10 +10,11 @@ git clone --recurse https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_
 In order to also get the latest of the required sub-projects (among them pico-sdk and picotool),
 afterwards recursively checkout these sub-modules:
 ```
-git submodule update --init --recursive
+git -c submodule."lib/mbedtls".update=none submodule update --init --recursive
 ```
 
 This will populate the sub-directory `external`.
+This will also skip to include Pico-SDK's mbedtls implementation, as it has compile-time errors.
 
 
 ## Windows Users (others skip to the next step)
@@ -67,7 +68,7 @@ that is one translating to the RISC-V CPU architecture (in particular *RISC-V 32
 Inside of our project's `external` directory, you may unpack this compiler into a `usr` directory, which we will
 install our host-tools picotool, too.
 
-2. Install the compiler by unpacking it and rename this to a new `external/usr/` directory name. Here for Linux Systems:
+2. Install the compiler by unpacking it and rename this to a new `external/usr/` directory name. Here for an Ubuntu Linux System:
 ```
 cd external/
 tar xf ~/Downloads/riscv32-embecosm-ubuntu2204-gcc13.2.0.tar.gz
@@ -86,7 +87,7 @@ So *always* set it using:
 ```
 export PATH=$PWD/usr/bin/:$PATH
 ```
-Only *then* will `which riscv32-unknown-elf-gcc` (and hence cmake in the following step) find this executable.
+Only *then* will `which riscv32-unknown-elf-gcc` find this executable and hence `cmake` in the following step.
 
 
 ## Compile `pico-sdk` and `picotool`
