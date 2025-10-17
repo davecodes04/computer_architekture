@@ -1,0 +1,5 @@
+add_executable(30_pwm_rgb_led 30_pwm_rgb_led.c)
+
+target_link_libraries(30_pwm_rgb_led hardware_pwm pico_rand pico_stdlib)
+
+pico_add_extra_outputs(30_pwm_rgb_led)
