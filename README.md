@@ -117,3 +117,23 @@ cmake --build BUILD
 cmake --install BUILD # Actually, this does nothing
 ```
 
+# Compilation of projects
+Now You may compile the various projects, e.g. head to directory `01_flash_leds` and build this project:
+```
+cd 01_flash_leds
+cmake -G Ninja -BBUILD .
+cmake --build BUILD
+```
+
+This will create an executable (using the gcc compiler and linker) and the `.uf2` file (using the picotool):
+```
+ls -al ./BUILD/src/01_flash_all_leds.uf2
+```
+
+By _pressing_ the BOOT *and* RELEASE Button and letting go the RELEASE button _first_, the WaveShare will go into USB-Flash mode:
+You may now copy this `.uf2` file onto the newly attached USB-Volume RP2350.
+You may do so by drag-and-drop using the File Explorer, or copy it using the Shell, e.g. on MacOS:
+```
+cp ./BUILD/src/01_flash_all_leds.uf2 /Volumes/RP2350/
+```
+
