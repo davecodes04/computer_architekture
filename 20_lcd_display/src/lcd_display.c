@@ -14,9 +14,7 @@ int main() {
     printf("1.28inch LCD demo...\r\n");
     LCD_1IN28_Init(HORIZONTAL);
     LCD_1IN28_Clear(WHITE);
-    DEV_SET_PWM(60);
-
-    printf("Starting to rotate through colors\n");
+    DEV_SET_PWM(60); // Required to get the Display to work
     while (true) {
         LCD_1IN28_Clear(colors[color]);
         color = (color+1) % num_colors;
