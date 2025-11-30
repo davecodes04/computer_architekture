@@ -429,16 +429,12 @@ void LCD_1IN28_Display(UWORD *Image)
 
 void LCD_1IN28_DisplayWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD *Image)
 {
-    // display
-    UDOUBLE Addr = 0;
-
-    UWORD j;
-    LCD_1IN28_SetWindows(Xstart, Ystart, Xend , Yend);
+    LCD_1IN28_SetWindows(Xstart, Ystart, Xend, Yend);
     DEV_Digital_Write(LCD_DC_PIN, 1);
-    for (j = Ystart; j < Yend - 1; j++) {
-        Addr = Xstart + j * LCD_1IN28_WIDTH ;
-        DEV_SPI_Write_nByte((uint8_t *)&Image[Addr], (Xend-Xstart)*2);
-    }
+    for (int j = Ystart; j < Yend; j++) {
+		int offset = Xstart + j * LCD_1IN28_WIDTH;
+        DEV_SPI_Write_nByte((uint8_t *)&Image[offset], (Xend-Xstart)*2);
+	}
 }
 
 
