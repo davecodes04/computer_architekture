@@ -31,7 +31,7 @@ static void LCD_1IN28_Reset(void)
     DEV_Digital_Write(LCD_RST_PIN, 0);
     DEV_Delay_ms(100);
     DEV_Digital_Write(LCD_RST_PIN, 1);
-	DEV_Digital_Write(LCD_CS_PIN, 0);
+    DEV_Digital_Write(LCD_CS_PIN, 0);
     DEV_Delay_ms(100);
 }
 
@@ -388,7 +388,7 @@ void LCD_1IN28_SetWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend)
 	LCD_1IN28_SendData_8Bit((Xend-1)>>8);
     LCD_1IN28_SendData_8Bit(Yend-1);
 
-    LCD_1IN28_SendCommand(0X2C);
+    LCD_1IN28_SendCommand(0x2C);
 }
 
 /******************************************************************************
@@ -407,7 +407,7 @@ void LCD_1IN28_Clear(UWORD Color)
     }
     
     LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH, LCD_1IN28_HEIGHT);
-    DEV_Digital_Write(LCD_DC_PIN, 1);;
+    DEV_Digital_Write(LCD_DC_PIN, 1);
     for(j = 0; j < LCD_1IN28_HEIGHT; j++){
         DEV_SPI_Write_nByte((uint8_t *)&Image[j*LCD_1IN28_WIDTH], LCD_1IN28_WIDTH*2);
     }
@@ -421,7 +421,7 @@ void LCD_1IN28_Display(UWORD *Image)
 {
     UWORD j;
     LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH, LCD_1IN28_HEIGHT);
-    DEV_Digital_Write(LCD_DC_PIN, 1);;
+    DEV_Digital_Write(LCD_DC_PIN, 1);
     for (j = 0; j < LCD_1IN28_HEIGHT; j++) {
         DEV_SPI_Write_nByte((uint8_t *)&Image[j*LCD_1IN28_WIDTH], LCD_1IN28_WIDTH*2);
     }
@@ -434,7 +434,7 @@ void LCD_1IN28_DisplayWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend
 
     UWORD j;
     LCD_1IN28_SetWindows(Xstart, Ystart, Xend , Yend);
-    DEV_Digital_Write(LCD_DC_PIN, 1);;
+    DEV_Digital_Write(LCD_DC_PIN, 1);
     for (j = Ystart; j < Yend - 1; j++) {
         Addr = Xstart + j * LCD_1IN28_WIDTH ;
         DEV_SPI_Write_nByte((uint8_t *)&Image[Addr], (Xend-Xstart)*2);
@@ -444,7 +444,7 @@ void LCD_1IN28_DisplayWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend
 
 void LCD_1IN28_DisplayPoint(UWORD X, UWORD Y, UWORD Color)
 {
-    LCD_1IN28_SetWindows(X,Y,X,Y);
+    LCD_1IN28_SetWindows(X, Y, X+1, Y+1);
     LCD_1IN28_SendData_16Bit(Color);
 }
 
