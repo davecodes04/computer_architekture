@@ -1,5 +1,6 @@
 # About
 Another project to show how to create and use images on the 1.28 inch LCD Display,
+setting the duty-cycle of the LCD's background LED using PWM,
 very rudimentary in comparison to the LVGL library.
 It is based on
  - WaveShare's abstractions of Pico-SDK in lib/

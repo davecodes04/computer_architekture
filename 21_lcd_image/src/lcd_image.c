@@ -74,5 +74,26 @@ int main() {
     img_bars_create(xstart, ystart, xstart + len, ystart + len, image);
     LCD_1IN28_DisplayWindows(xstart, ystart, xstart + len, ystart + len, image);
 
+    /* Additionally show how the duty-cycle of the background-lighting works */
+    int pwm_duty = 60;
+    int pwm_inc = 0;
+    while (true) {
+        DEV_SET_PWM(pwm_duty);
+
+        if (pwm_inc) {
+            if (pwm_duty < 100)
+                pwm_duty += 5;
+            else
+                pwm_inc = 0;
+        } else {
+            if (pwm_duty > 0)
+                pwm_duty -= 5;
+            else
+                pwm_inc = 1;
+        }
+        printf("pwm_duty:%d\n", pwm_duty);
+        sleep_ms(100);
+    }
+
     DEV_Module_Exit();
 }

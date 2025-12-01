@@ -14,7 +14,7 @@ int main() {
     printf("1.28inch LCD demo...\r\n");
     LCD_1IN28_Init(HORIZONTAL);
     LCD_1IN28_Clear(WHITE);
-    DEV_SET_PWM(60); // Required to get the Display to work
+    DEV_SET_PWM(60); // Turn on LCD Background lighting with 60%
     while (true) {
         LCD_1IN28_Clear(colors[color]);
         color = (color+1) % num_colors;
