@@ -86,8 +86,10 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendCommand(0xEB);
     LCD_1IN28_SendData_8Bit(0x14);
 
-    LCD_1IN28_SendCommand(0xFE);
-    LCD_1IN28_SendCommand(0xEF);
+	/* BEGIN set inter_command HIGH */
+    LCD_1IN28_SendCommand(0xFE);     // Inter register enable 1
+    LCD_1IN28_SendCommand(0xEF);     // Inter register enable 2
+	/* END set inter_command HIGH */
 
     LCD_1IN28_SendCommand(0xEB);
     LCD_1IN28_SendData_8Bit(0x14);
@@ -128,16 +130,18 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendCommand(0x8F);
     LCD_1IN28_SendData_8Bit(0xFF);
 
-
+    /* BEGIN Display function control */
     LCD_1IN28_SendCommand(0xB6);
-    LCD_1IN28_SendData_8Bit(0x00);
-    LCD_1IN28_SendData_8Bit(0x20);
+    LCD_1IN28_SendData_8Bit(0x00);   // Always zero
+    LCD_1IN28_SendData_8Bit(0x20);   // GS=0: Gate Output Scan G1->G240
+	                                 // SS=1: Source Output Scan S360->S1
+	/* END Display function control */
 
-    LCD_1IN28_SendCommand(0x36);
-    LCD_1IN28_SendData_8Bit(0x08); // Set as vertical screen
+    LCD_1IN28_SendCommand(0x36);     // Memory Access Control
+    LCD_1IN28_SendData_8Bit(0x08);   // Set as vertical screen
 
-    LCD_1IN28_SendCommand(0x3A);
-    LCD_1IN28_SendData_8Bit(0x05);
+    LCD_1IN28_SendCommand(0x3A);     // Pixel Format Set
+    LCD_1IN28_SendData_8Bit(0x05);   // DBI = 16 Bits/Pixel
 
 
     LCD_1IN28_SendCommand(0x90);
@@ -157,13 +161,18 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x01);
     LCD_1IN28_SendData_8Bit(0x04);
 
-    LCD_1IN28_SendCommand(0xC3);
-    LCD_1IN28_SendData_8Bit(0x13);
-    LCD_1IN28_SendCommand(0xC4);
-    LCD_1IN28_SendData_8Bit(0x13);
+    LCD_1IN28_SendCommand(0xC3);     // Power Control 2 for vreg1_vbp_d
+    LCD_1IN28_SendData_8Bit(0x13);   // VREG1A = (0x13 + 40)*0.02 + 4
+	                                 // VREG1B = (0x13 * 0.02) + 0.3
+									 // default is 0x3C
+    LCD_1IN28_SendCommand(0xC4);     // Power Control 3 for vreg2
+    LCD_1IN28_SendData_8Bit(0x13);   // VREG2A = 0x13 * 0.02 - 4.2
+	                                 // VREG2B = 0x13 * 0.02 + 0.3
+									 // default is 0x3C
 
-    LCD_1IN28_SendCommand(0xC9);
-    LCD_1IN28_SendData_8Bit(0x22);
+    LCD_1IN28_SendCommand(0xC9);     // Power Control 4 for vrh
+    LCD_1IN28_SendData_8Bit(0x22);   // VREG1A = (vrh+vbp_d)*0.02+4
+	                                 // VREG2A = (vbn_d-vrh)*0.02-3.4
 
     LCD_1IN28_SendCommand(0xBE);
     LCD_1IN28_SendData_8Bit(0x11);
@@ -177,7 +186,7 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x0c);
     LCD_1IN28_SendData_8Bit(0x02);
 
-    LCD_1IN28_SendCommand(0xF0);
+    LCD_1IN28_SendCommand(0xF0);     // Set Gamma 1
     LCD_1IN28_SendData_8Bit(0x45);
     LCD_1IN28_SendData_8Bit(0x09);
     LCD_1IN28_SendData_8Bit(0x08);
@@ -185,7 +194,7 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x26);
     LCD_1IN28_SendData_8Bit(0x2A);
 
-    LCD_1IN28_SendCommand(0xF1);
+    LCD_1IN28_SendCommand(0xF1);     // Set Gamma 2
     LCD_1IN28_SendData_8Bit(0x43);
     LCD_1IN28_SendData_8Bit(0x70);
     LCD_1IN28_SendData_8Bit(0x72);
@@ -194,7 +203,7 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x6F);
 
 
-    LCD_1IN28_SendCommand(0xF2);
+    LCD_1IN28_SendCommand(0xF2);     // Set Gamma 3
     LCD_1IN28_SendData_8Bit(0x45);
     LCD_1IN28_SendData_8Bit(0x09);
     LCD_1IN28_SendData_8Bit(0x08);
@@ -202,7 +211,7 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x26);
     LCD_1IN28_SendData_8Bit(0x2A);
 
-    LCD_1IN28_SendCommand(0xF3);
+    LCD_1IN28_SendCommand(0xF3);     // Set Gamma 4
     LCD_1IN28_SendData_8Bit(0x43);
     LCD_1IN28_SendData_8Bit(0x70);
     LCD_1IN28_SendData_8Bit(0x72);
@@ -232,8 +241,8 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x08);
     LCD_1IN28_SendData_8Bit(0x03);
 
-    LCD_1IN28_SendCommand(0xE8);
-    LCD_1IN28_SendData_8Bit(0x34);
+    LCD_1IN28_SendCommand(0xE8);     // Frame Rate
+    LCD_1IN28_SendData_8Bit(0x34);   // Display Inversion = 2-column inversion
 
     LCD_1IN28_SendCommand(0x62);
     LCD_1IN28_SendData_8Bit(0x18);
@@ -309,12 +318,12 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendData_8Bit(0x3e);
     LCD_1IN28_SendData_8Bit(0x07);
 
-    LCD_1IN28_SendCommand(0x35);
+    LCD_1IN28_SendCommand(0x35);    // Tearing Effect Line ON
     LCD_1IN28_SendCommand(0x21);
 
-    LCD_1IN28_SendCommand(0x11);
+    LCD_1IN28_SendCommand(0x11);    // Sleep OUT
     DEV_Delay_ms(120);
-    LCD_1IN28_SendCommand(0x29);
+    LCD_1IN28_SendCommand(0x29);    // Display ON
     DEV_Delay_ms(20);
 }
 
@@ -327,23 +336,36 @@ static void LCD_1IN28_SetAttributes(UBYTE Scan_dir)
 {
     //Get the screen scan direction
     LCD_1IN28.SCAN_DIR = Scan_dir;
-    UBYTE MemoryAccessReg = 0x08;
+    UBYTE MemoryAccessReg;
+
+	/*
+	 * MemoryAccessReg:
+	 *   D7  D6  D5  D4  D3  D2  D1  D0
+	 *   MY  MX  MV  ML  BGR MH  0   0
+	 * Where:
+	 * MY = Row Adress Order         \ These 3 bits control MCU
+	 * MX = Column Adress Order      | to memory write/read
+	 * MV = Row/Column Exchange      / direction.
+	 * ML = Vertical Refresh Order   | LCD vertical refresh direction control
+	 * BGR = RGB-BGR Order           | Color selector switch control
+	 *    0 = RGB color filter panel, 1 = BGR color filter panel
+	 * MH = Horizontal Refersh Order | LCD horizontal refreshing direction control
+	 */
 
     //Get GRAM and LCD width and height
     if(Scan_dir == HORIZONTAL) {
         LCD_1IN28.HEIGHT = LCD_1IN28_HEIGHT;
         LCD_1IN28.WIDTH = LCD_1IN28_WIDTH;
-        MemoryAccessReg = 0Xc8;
+        MemoryAccessReg = 0xc8;	// MY=set MX=Set; BGR=Set
     } else {
         LCD_1IN28.HEIGHT = LCD_1IN28_WIDTH;
         LCD_1IN28.WIDTH = LCD_1IN28_HEIGHT;
-        MemoryAccessReg = 0X68;
+        MemoryAccessReg = 0x68; // MX=Set; MV=Set; BGR=Set
     }
 
     // Set the read / write scan direction of the frame memory
-    LCD_1IN28_SendCommand(0x36); //MX, MY, RGB mode
-    //LCD_1IN28_SendData_8Bit(MemoryAccessReg);    //0x08 set RGB
-    LCD_1IN28_SendData_8Bit(MemoryAccessReg);    //0x08 set RGB
+    LCD_1IN28_SendCommand(0x36);
+    LCD_1IN28_SendData_8Bit(MemoryAccessReg);
 }
 
 /********************************************************************************
@@ -367,27 +389,28 @@ void LCD_1IN28_Init(UBYTE Scan_dir)
 /********************************************************************************
 function:    Sets the start position and size of the display area
 parameter:
-        Xstart     :   X direction Start coordinates
+        Xstart  :   X direction Start coordinates
         Ystart  :   Y direction Start coordinates
         Xend    :   X direction end coordinates
         Yend    :   Y direction end coordinates
 ********************************************************************************/
 void LCD_1IN28_SetWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend)
 {
-    //set the X coordinates
+    // Column Address Set -- Set the X coordinates
     LCD_1IN28_SendCommand(0x2A);
-    LCD_1IN28_SendData_8Bit(0x00);
+    LCD_1IN28_SendData_8Bit(0x00);		// high bit, always zero?
     LCD_1IN28_SendData_8Bit(Xstart);
     LCD_1IN28_SendData_8Bit((Xend-1)>>8);
     LCD_1IN28_SendData_8Bit(Xend-1);
 
-    //set the Y coordinates
+    // Row Adress Set -- Set the Y coordinates
     LCD_1IN28_SendCommand(0x2B);
     LCD_1IN28_SendData_8Bit(0x00);
     LCD_1IN28_SendData_8Bit(Ystart);
     LCD_1IN28_SendData_8Bit((Xend-1)>>8);
     LCD_1IN28_SendData_8Bit(Yend-1);
 
+	// Memory Write
     LCD_1IN28_SendCommand(0x2C);
 }
 
