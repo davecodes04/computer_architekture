@@ -11,8 +11,8 @@
 * | Info     :   Basic version
 *
 ******************************************************************************/
-#include "LCD_1in28.h"
-#include "DEV_Config.h"
+#include "Config/DEV_Config.h"
+#include "lcd/LCD_1in28.h"
 
 #include <stdlib.h>
 #include <stdio.h>

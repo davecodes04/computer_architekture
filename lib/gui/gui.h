@@ -6,7 +6,7 @@
 #ifndef __GUI_H__
 #define __GUI_H__
 
-#include "DEV_Config.h"
+#include "Config/DEV_Config.h"
 #include "Fonts/fonts.h"
 
 #ifdef __cplusplus
@@ -41,6 +41,8 @@ typedef enum {
 
 void gui_image_new (UBYTE * image, UWORD width, UWORD height, WIN_ROTATE rotate, UWORD color);
 void gui_image_select (UBYTE * image);
+void gui_image_backup (void);
+void gui_image_restore (void);
 
 // void gui_set_*
 

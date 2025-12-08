@@ -1,11 +1,13 @@
-#include "DEV_Config.h"
-#include "gui.h"
+#include "Config/DEV_Config.h"
+#include "gui/gui.h"
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 struct win {
     UBYTE * image;
+    UBYTE * backup;
     UWORD width;
     UWORD height;
     UWORD width_mem;
@@ -20,6 +22,7 @@ struct win {
 
 void gui_image_new (UBYTE * image, UWORD width, UWORD height, WIN_ROTATE rotate, UWORD color) {
     win.image = image;
+    win.backup = NULL;
     win.width_mem = width;
     win.height_mem = height;
     win.width_byte = width*2;
@@ -37,6 +40,23 @@ void gui_image_new (UBYTE * image, UWORD width, UWORD height, WIN_ROTATE rotate,
 
 void gui_image_select (UBYTE * image) {
     win.image = image;
+}
+
+void gui_image_backup (void) {
+    UBYTE * tmp;
+    if (NULL == win.backup) {
+        tmp = malloc (2 * win.width * win.height);
+        if (NULL == tmp)
+            return;
+    }
+    win.backup = tmp;
+    memcpy (win.backup, win.image, 2 * win.width * win.height);
+}
+
+void gui_image_restore(void) {
+    if (NULL == win.backup)
+        return;
+    memcpy (win.image, win.backup, 2 * win.width * win.height);
 }
 
 void gui_clear (UWORD color) {
