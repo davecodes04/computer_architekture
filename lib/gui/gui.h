@@ -13,8 +13,10 @@
 extern "C" {
 #endif
 
-#define WHITE               0xFFFF
-#define FONT_BACKGROUND    WHITE
+#define GUI_RGB(red8,green8,blue8) ( ((((unsigned long long int)red8*31)   / 255) << 11) | \
+                                     ((((unsigned long long int)green8*63) / 255) << 5)  | \
+                                      (((unsigned long long int)blue8*31)  / 255))
+#define FONT_BACKGROUND    GUI_RGB(0xff, 0xff, 0xff)
 
 typedef enum {
     ROTATE_0 = 0,
@@ -49,7 +51,7 @@ void gui_image_restore (void);
 void gui_clear (UWORD color);
 void gui_draw_pixel (UWORD x, UWORD y, UWORD color);
 // void gui_draw_point (UWORD x, UWORD y, UWORD color, WIN_PIXEL_WIDTH width);
-void gui_draw_line (UWORD xstart, UWORD xend, UWORD ystart, UWORD yend, UWORD color);
+void gui_draw_line (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color);
 void gui_draw_rectangle (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color, WIN_DRAW_FILL fill_p);
 void gui_draw_circle (UWORD x, UWORD y, UWORD radius, UWORD color, WIN_DRAW_FILL fill_p);
 

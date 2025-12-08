@@ -123,18 +123,18 @@ void gui_draw_pixel (UWORD x, UWORD y, UWORD color) {
     set_pixel(x, y, color);
 }
 
-void gui_draw_line (UWORD xstart, UWORD xend, UWORD ystart, UWORD yend, UWORD color) {
+void gui_draw_line (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color) {
     if (xstart > win.width || ystart > win.height ||
         xend > win.width || yend > win.height)
         return;
     UWORD x = xstart;
     UWORD y = ystart;
 
-    UWORD dx = (xend >= xstart) ? (xend - xstart) : (xstart - xend);
-    UWORD dy = (yend >= ystart) ? (yend - ystart) : (ystart - yend);
+    int dx = (int)xend - (int)xstart >= 0 ? (xend - xstart) : (xstart - xend);
+    int dy = (int)yend - (int)ystart <= 0 ? (yend - ystart) : (ystart - yend);
 
-    int x_add = xend >= xstart ? -1 : 1;
-    int y_add = yend >= ystart ? -1 : 1;
+    int x_add = xstart < xend ? 1 : -1;
+    int y_add = ystart < yend ? 1 : -1;
 
     int esp = dx + dy;
     
@@ -143,14 +143,14 @@ void gui_draw_line (UWORD xstart, UWORD xend, UWORD ystart, UWORD yend, UWORD co
         if (2 * esp >= dy) {
             if (x == xend)
                 break;
-            esp += dy;
             x += x_add;
+            esp += dy;
         }
         if (2 * esp <= dx) {
             if (y == yend)
                 break;
-            esp += dx;
             y += y_add;
+            esp += dx;
         }
     }
 }
