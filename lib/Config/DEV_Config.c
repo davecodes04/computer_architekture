@@ -27,6 +27,7 @@
 # THE SOFTWARE.
 ******************************************************************************/
 #include "DEV_Config.h"
+#include <stdint.h>
 
 uint slice_num;
 
