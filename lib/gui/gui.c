@@ -205,8 +205,8 @@ void gui_draw_circle (UWORD x, UWORD y, UWORD radius, UWORD color, WIN_DRAW_FILL
             gui_draw_pixel(x + xpos, y + ypos, color);
             gui_draw_pixel(x - xpos, y + ypos, color);
 
-            gui_draw_pixel(x - xpos, y + ypos, color);
-            gui_draw_pixel(x - xpos, y - ypos, color);
+            gui_draw_pixel(x - ypos, y + xpos, color);
+            gui_draw_pixel(x - ypos, y - xpos, color);
 
             gui_draw_pixel(x - xpos, y - ypos, color);
             gui_draw_pixel(x + xpos, y - ypos, color);
