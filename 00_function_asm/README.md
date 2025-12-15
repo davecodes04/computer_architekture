@@ -8,6 +8,7 @@ functionality in a separate Assembler file.
 This is not based on any Pico-SDK calls -- and solely requires
 Pico-SDK to correctly link the file into an ELF-based executable,
 which in turn is then reprogrammed into a USB-Flashing Format UF2.
+Hence, we need the pico_runtime link-target dependency.
 
 # Board Setup
 Nothing special, there's no additional hardware on the breadboard.
