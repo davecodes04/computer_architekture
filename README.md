@@ -137,3 +137,83 @@ You may do so by drag-and-drop using the File Explorer, or copy it using the She
 cp ./BUILD/src/01_flash_all_leds.uf2 /Volumes/RP2350/
 ```
 
+# Debugging
+There's multiple ways to debug programs running on the RP2350. The dumbest of them all is `printf`-debugging, which requires
+to set in `CMakeLists.txt`
+```pico_enable_stdio_usb(executable_name 1)```
+and then attaching a UART-program (like minicom) to the serial interface, showing the output of `stdout`.
+
+Better alternatives are real debuggers. Listed in terms of diminishing convenience
+- Segger IDE: This interactive IDE features a debugger, which will also use the JTAG/SWD Interface exposed using RPI's DebugProbe Hardware
+- VScode using Plattform IO: The Platform IO extension offers a interative debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project.
+- GDB using OpenOCD: Running the GNU Debugger on the console.
+
+## Segger IDE
+We will not use this for now
+
+## VSCode using Plattform IO:
+XXX
+
+## GDB using OpenOCD
+OpenOCD allows connecting to the RPI's DebugProbe Hardware (which itselve is just a PICO with a RP2040) over USB. This DebugProbe is attached to
+WaveShare's SWCLK and SWDIO pins (as well as GND!).
+OpenOCD when started detects the DebugProbe Hardware:
+```
+openocd -s INSTALL_DIR/share/ -f interface/cmsis-dap.cfg -f target/rp2350-riscv.cfg -c "adapter speed 5000" -c "set USE_CORE 0" 
+```
+where `INSTALL_DIR` is the directory where OpenOCD was installed into: this is just required to find the `.cfg` files in the
+subdirectories below the `INSTALL_DIR`.
+
+The output should look like this:
+```
+Open On-Chip Debugger 0.12.0+dev-00002-gcd4873400 (2025-12-08-16:09)
+Licensed under GNU GPL v2
+For bug reports, read
+	http://openocd.org/doc/doxygen/bugs.html
+Info : [rp2350.rv0] Hardware thread awareness created
+Info : [rp2350.rv1] Hardware thread awareness created
+ocd_process_reset_inner
+adapter speed: 5000 kHz
+Info : Listening on port 6666 for tcl connections
+Info : Listening on port 4444 for telnet connections
+Info : Using CMSIS-DAPv2 interface with VID:PID=0x2e8a:0x000c, serial=E661640843775933
+...
+Info : CMSIS-DAP: Interface ready
+Info : clock speed 5000 kHz
+Info : [rp2350.rv0] Examined RISC-V core
+...
+Info : Listening on port 3333 for gdb connections
+```
+(some lines cut)
+
+Now, one may start the debugger GDB (configured in the RISC-V toolchain):
+```
+riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf
+```
+where PROJECT_BINARY is the name of the output file.
+While we copied the UF2-File to the RP2350, the ELF-File is the actual executable, which GDB will analyse.
+
+All the commands however need to go to the DebugProbe, which will relay these to the RP2350.
+So we need to tell GDB to connect using `target extended-remote localhost:3333`.
+Most often, we execute these commands from the `BUILD` directory (hence the `src/` prefix above).
+And most often, we want the code to break on the `main` function.
+We may supply gdb with these commands upon startup:
+```
+riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf --ex "target extended-remote localhost:3333" --ex "dir $PWD/../src" --ex "break main"
+```
+
+## GDB commands
+GDB is very powerful using the command line:
+1. Setting Breakpoints
+    1. `break main`  sets a breakpoint on function main
+    2. `break LINE_NUMER` 
+2. Execution
+    1. `run` starts the execution from the beginning
+    2. `cont` continues until the next breakpoint (or until an error)
+    3. `finish` finished this function, returning to the caller
+3. Displaying
+    1. `print VAR` printing variables
+    2. `info reg` Show all registers
+    3. `info reg a0 t0 s0` Show values of these three specific registers
+    4. `x/16 0x40000` Show memory values, here 16 Bytes at address 0x40000
+For all above commands, there is help available using `help COMMAND`.
