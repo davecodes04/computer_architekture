@@ -50,8 +50,9 @@ void gui_image_restore (void);
 
 void gui_clear (UWORD color);
 void gui_draw_pixel (UWORD x, UWORD y, UWORD color);
-// void gui_draw_point (UWORD x, UWORD y, UWORD color, WIN_PIXEL_WIDTH width);
+void gui_draw_point (UWORD x, UWORD y, UWORD color, UWORD width);
 void gui_draw_line (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color);
+void gui_draw_line_width (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color, UWORD width);
 void gui_draw_rectangle (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color, WIN_DRAW_FILL fill_p);
 void gui_draw_circle (UWORD x, UWORD y, UWORD radius, UWORD color, WIN_DRAW_FILL fill_p);
 

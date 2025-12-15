@@ -123,6 +123,17 @@ void gui_draw_pixel (UWORD x, UWORD y, UWORD color) {
     set_pixel(x, y, color);
 }
 
+void gui_draw_point(UWORD x, UWORD y, UWORD color, UWORD width) {
+    if (x > win.width || y > win.height)
+        return;
+
+    for (UWORD ydir = 0; ydir < width; ydir++) {
+        for (UWORD xdir = 0; xdir < width; xdir++) {
+            set_pixel (x + xdir, y + ydir, color);
+        }
+    }
+}
+
 void gui_draw_line (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color) {
     if (xstart > win.width || ystart > win.height ||
         xend > win.width || yend > win.height)
@@ -140,6 +151,38 @@ void gui_draw_line (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD co
     
     while (1) {
         gui_draw_pixel(x, y, color);
+        if (2 * esp >= dy) {
+            if (x == xend)
+                break;
+            x += x_add;
+            esp += dy;
+        }
+        if (2 * esp <= dx) {
+            if (y == yend)
+                break;
+            y += y_add;
+            esp += dx;
+        }
+    }
+}
+
+void gui_draw_line_width (UWORD xstart, UWORD ystart, UWORD xend, UWORD yend, UWORD color, UWORD width) {
+    if (xstart > win.width || ystart > win.height ||
+        xend > win.width || yend > win.height)
+        return;
+    UWORD x = xstart;
+    UWORD y = ystart;
+
+    int dx = (int)xend - (int)xstart >= 0 ? (xend - xstart) : (xstart - xend);
+    int dy = (int)yend - (int)ystart <= 0 ? (yend - ystart) : (ystart - yend);
+
+    int x_add = xstart < xend ? 1 : -1;
+    int y_add = ystart < yend ? 1 : -1;
+
+    int esp = dx + dy;
+    
+    while (1) {
+        gui_draw_point(x, y, color, width);
         if (2 * esp >= dy) {
             if (x == xend)
                 break;
