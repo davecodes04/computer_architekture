@@ -1,13 +1,17 @@
-        .file   "led.S"
-        .attribute arch, "rv32imac_zbs_zba"
-        .attribute unaligned_access, 0
-        .attribute stack_align, 16
+/** \file led.S
+ * \brief Functions to handle LEDs connected to GPIOs using SIO
+ *
+ * These model the way, the Pico-SDK initialized a GPIO for
+ * Single-Cycle IO (SIO) following the hardware definitions in
+ * the various HW-definition files (most importantly the CMSIS),
+ * as well as their interaction with he IO banks in a PAD.
+ */
 
-/*
+/**
  * First we require some constant definitions, to make the ASM code
  * more readable.
  */
-
+ 
 # From pico-sdk/src/rp2_common/cmsis/stub/CMSIS/Device/RP2350/Include/RP2350.h
 .equ SIO_BASE,        0xD0000000 # The start address of the Single-Cycle IO Block
 .equ IO_BANK0_BASE,   0x40028000 # 
@@ -34,7 +38,6 @@
  */
 
         .text
-        .section        .text.startup,"ax",@progbits
         .align  1
 
 /**
@@ -47,7 +50,6 @@
  * \return void     
  */
         .global led_init
-        .type   led_init, @function
 led_init:
         # Save Registers s0-sX, ra
         li      t0, NUM_BANK0_GPIOS                        # Get the number of GPIOs in Bank0 (in RP2350A, it's just one bank)
@@ -85,7 +87,6 @@ led_init:
         sw      a3, GPIO_OE_SET(a4)                        # sio_hw->gpio_oe_set = mask;
 .led_init_out:
         ret
-        .size   led_init, . - led_init
 
 
 /**
@@ -98,7 +99,6 @@ led_init:
  * \return void
  */
         .global led_on
-        .type   led_on, @function
 led_on:
         li      t0, NUM_BANK0_GPIOS                        # Get the number of GPIOs in Bank0 (in RP2350A, it's just one bank)
         bge     a0, t0, .led_on_out                        # and jump out if the gpio parameter is bigger
@@ -108,7 +108,6 @@ led_on:
         sw      a1, GPIO_OUT_SET(a2)                       # Set the Bit of the in sio_hw->gpio_set
 .led_on_out:
         ret
-        .size   led_on, . - led_on
 
 
 /**
@@ -121,7 +120,6 @@ led_on:
  * \return void
  */
         .global led_off
-        .type   led_off, @function
 led_off:
         li      t0, NUM_BANK0_GPIOS                        # Get the number of GPIOs in Bank0 (in RP2350A, it's just one bank)
         bge     a0, t0, .led_off_out                       # and jump out if the gpio parameter is bigger
@@ -131,6 +129,3 @@ led_off:
         sw      a1, GPIO_OUT_CLR(a2)                       # Set the Bit of the in sio_hw->gpio_clr
 .led_off_out:
         ret
-        .size   led_off, . - led_off
-
-        .ident  "GCC: (GNU) 16.0.0 20251109 (experimental)"

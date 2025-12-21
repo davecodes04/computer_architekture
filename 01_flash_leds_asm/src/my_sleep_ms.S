@@ -1,10 +1,13 @@
-        .file   "my_sleep_ms.S"
-        .attribute arch, "rv32imac_zbs_zba"
-        .attribute unaligned_access, 0
-        .attribute stack_align, 16
+/** \file my_sleep_ms.S
+ * \brief Function to sleep for ms multi-seconds.
+ *
+ * This is *not* a proper timing function, as it is just 
+ * based on "experience" running on 150 MHz RP2350 with
+ * this inner loop.  We will use the timers otherwise
+ * for proper timing (just like the Pico-SDK employs).
+ */
 
         .text
-        .section .text.startup,"ax",@progbits
         .align  1
 
 # Define to a large enough value to denote one ms
@@ -20,7 +23,6 @@
  * \return void
  */
         .global my_sleep_ms
-        .type   my_sleep_ms, @function
 my_sleep_ms:
         lui t0, SLEEP_1_MS
         mul t0, t0, a0
@@ -28,6 +30,3 @@ my_sleep_ms:
         add t0, t0, -1
         bne t0, zero, .my_sleep_ms_repeat
         ret
-        .size   my_sleep_ms, . - my_sleep_ms # GAS Trick: "." evaluates to the current address (after the start)
-
-        .ident  "GCC: (GNU) 16.0.0 20251109 (experimental)"
