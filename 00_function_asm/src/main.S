@@ -4,9 +4,10 @@
 #
 # Author: Rainer Keller, HS-Esslingen
 #
-# Remember, this is an ELF target
 
-        .file   "main.S"                                   # Old Assembler directive to tell the file name of this unit
+# These are comment lines -- everything after # is ignored, however
+# coment lines starting in column 0 could be interpreted, if the include
+# a line number, followed by a dash then a string, like '# 9-17 "file.S"'
 
         # The following attributes are specific to RISC-V Assemblers:
         # The arch attribute tells the assembler, what kind of RISC-V core we compile for:
@@ -17,36 +18,51 @@
         .attribute unaligned_access, 0                     # Do not allow unaligned memory access
         .attribute stack_align, 16                         # Stack Alignment to 16 Bytes (16 is the default)
 
-        .section data, "aMS", @progbits, 1                 # Declaration of the data section: _a_llocatable, _M_ergeble, contains zero-terminated _S_trings
+        # The C-compiler even adds a ".section" (below without dot)
+        # to specify a unique name, followed by flags here in colons,
+        # followed by a @type (a specific constant)
+        # Our code us fine with the linker's defaults!
+        # more https://sourceware.org/binutils/docs/as/Section.html
+        #   section data, "aMS", @progbits, 1              # Declaration of the data section: _a_llocatable, _M_ergeble, contains zero-terminated _S_trings
+        .section data
         .align  2                                          # Aligned to 2^2 Bytes (aka 4 Bytes)
-.myString:                                                 # Label of the following String ".myString" -- by convention starts with a "."
-        .string "Test Assembler"                           # NUL-terminated String
+myString:                                                  # Label of the following String "myString" as local symbol
+        .string "Test Assembler"                           # NUL-terminated String -- sometimes as also with GAS directory .asciiz
+
 
         .text                                              # Mark the next section as .text/.code section
-        .section .text.startup, "ax", @progbits            # ELF Section with name ".text.startup" is e_x_ecutable and a_llocatable -- and it contains "data" (code bytes)
+        # See the description above:
+        #  section .text.startup, "ax", @progbits          # ELF Section with name ".text.startup" is e_x_ecutable and a_llocatable -- and it contains "data" (code bytes)
         .align  1                                          # Aligned to 2^1 Bytes (aka 2 Bytes)
         .global  main                                      # Defines a globally-visible (exported) symbol "main", visible to the linker ld
-        .type   main, @function                            # ELF: mark the symbol main as a function
 main:                                                      # The location of the Symbol "main": here, the function starts
         # 0. Safe the callee's state: safe the return address (ra) register to the Stack -- create some space, first
         addi    sp, sp, -4                                 # Reserve 4 bytes on the Stack
-        sw      ra, 0(sp)                                  # Save the ra register onto the stack
+        sw      ra, -4(sp)                                 # Save the ra register onto the stack
 
-        # 1. an Example on how to call functions
-        lui     a0, %hi(.myString)                         # Load the upper-immediate 20 Bits of the address of Symbol ".myString"
-        addi    a0, a0, %lo(.myString)                     # Add to that the lower 20 Bits of the address
+        # 1. An example how to compare real instructions (mul, lui, et al) and pseudo-instructions (li, mv, sw, ret):
+        li    a0, 0xffff                                   # Load-immediate; hey bigger than 12-bit? This is pseudo-instruction will be turned into 2 instructions: lui plus addi
+        mul   a1, a0, a0                                   # Multiply 65535 * 65535 into a1 ---> 4.294.836.225, aka fits into 32-bit
+        li    a2, 65536                                    # This time load immediate, but here instead of 0xffff, one higher 0x10000 
+        mul   a3, a2, a2                                   # Multiply 65536 * 65536 into a3 ---> will not fit into 32-Bits --> a3 = 0
+        mulh  a4, a2, a2                                   # Multiply but return the HIGH-bist into a4, aka we get the "overflown" 32-bit --> a4 = 1
+        mulhu a5, a2, a2                                   # Multiple high unsigned: interpret the multiplication as unsigned (same as above since 65535 > 0!)
+
+        # 2. An example on how to call functions
+        lui     a0, %hi(myString)                          # Load the upper-immediate 20 Bits of the address of Symbol "LmyString"
+        addi    a0, a0, %lo(myString)                      # Add to that the lower 20 Bits of the address
         jal     my_strlen                                  # Jump-and-Link to function my_strlen
 
-        # 2. Restore the state: restore the return address (ra) register, and restore the stack pointer
-        lw      ra, 0(sp)                                  # Restore the ra register
+        # 3. Restore the state: restore the return address (ra) register, and restore the stack pointer
+        lw      ra, -4(sp)                                 # Restore the ra register
         addi    sp, sp, 4                                  # Clean up the Stack-pointer
 
-        # 4. Exit this function
+        # 5. Exit this function
         ret                                                # Return to the caller
 
+        # The following is not really necessary, it calculates the size of the main function
+        # This may be necessary for situations when You need to calculate the size of Your
+        # data stored in the data section
         .size   main, . - main                             # GAS Trick: "." evaluates to the current address (after the start)
-
-        .ident  "GCC: (GNU) 16.0.0 20251109 (experimental)"
-        .section .note.GNU-stack, "", @progbits
 
         
