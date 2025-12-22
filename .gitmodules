@@ -4,3 +4,6 @@
 [submodule "external/picotool"]
 	path = external/picotool
 	url = https://github.com/raspberrypi/picotool
+[submodule "external/openocd"]
+	path = external/openocd
+	url = https://github.com/hpcraink/openocd.git
