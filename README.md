@@ -90,7 +90,7 @@ export PATH=$PWD/usr/bin/:$PATH
 Only *then* will `which riscv32-unknown-elf-gcc` find this executable and hence `cmake` in the following step.
 
 
-## Compile `pico-sdk` and `picotool`
+## Compile `pico-sdk` and `picotool`, as well as `openocd`
 The Pico-SDK is the main Software Devolpment Kit by the Raspberry PI foundation. It's open source and like any Hardware Abstraction Layer (HAL), a very thin and light-weight layer on top of RP2040 and RP2350.
 
 Picotool allows interacting with RP2040 and RP2350, e.g. uploading files or converting the binary/hexadecimal executable
@@ -115,6 +115,16 @@ test -d BUILD && rm -fr BUILD
 cmake -G Ninja -BBUILD -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DPICO_PLATFORM=rp2350-riscv -DPICO_BOARD=waveshare_rp2350_lcd_1.28 .
 cmake --build BUILD
 cmake --install BUILD # Actually, this does nothing
+```
+
+3. Finally build the `openocd` binary for connecting and using RPI's DebugProbe as Debugger HW. This software compiles using Autoconf and Automake,
+it needs to be called with configure prior to calling make. Pay attention to disable the "Warnings-as-Errors" flag for GCC:
+```
+cd external/openocd
+test -d BUILD && rm -fr BUILD ; mkdir BUILD && cd BUILD
+../configure --prefix=$PWD/../../usr --disable-werror
+make
+make install
 ```
 
 # Compilation of projects
