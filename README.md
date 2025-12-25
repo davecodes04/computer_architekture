@@ -18,7 +18,9 @@ git -c submodule."lib/mbedtls".update=none submodule update --init --recursive
 
 This will populate the sub-directory `external`.
 This will also skip to include Pico-SDK's mbedtls implementation, as it has compile-time errors.
+(maybe this submodule is needed however to compile picotool)...
 
+*First*, we will run from the command line, later You may setup VSCode with extensions)
 
 ## Windows Users (others skip to the next step)
 On Windows, it's best to use Windows Subsystem for Linux (WSL) for compiling and configuration under Linux, and editing with Visual-Studio under Windows.
@@ -130,7 +132,7 @@ make
 make install
 ```
 
-# Compilation of projects
+# Compilation of projects from the command line
 Now You may compile the various projects, e.g. head to directory `01_flash_leds` and build this project:
 ```
 cd 01_flash_leds
@@ -149,6 +151,13 @@ You may do so by drag-and-drop using the File Explorer, or copy it using the She
 ```
 cp ./BUILD/src/01_flash_all_leds.uf2 /Volumes/RP2350/
 ```
+
+# Compilation of projects from VSCode
+Editing and compiling from VSCode requires a few extensions. Please install the following:
+* C/C++ from Microsoft to allow editing C- and Header-files
+* RISC-V Support from zwhu95 which allows syntax-highlighting on RISC-V Assembler-files.
+* CMake Tools from Microsoft to allow building projects (based on the `tasks.json` and `settings.json` files)
+* Cortex-Debug from marus25, which allows the Debugging as described below (installs various sub-projects)
 
 # Debugging
 There's multiple ways to debug programs running on the RP2350. The dumbest of them all is `printf`-debugging, which requires
