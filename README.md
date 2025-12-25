@@ -169,9 +169,15 @@ We will not use this for now.
 We will not use this for now.
 
 ## VSCode using Cortex-Debug
-The VSCode extension Cortex-Debug will create an `openocd` server, which attaches to the RPI DebugProbe over USB.
-Then, the extension will start a `riscv32-unknown-elf-gdb` which attaches to the `openocd` server and will issue gdb commands, such as `break main`.
-In the opening debugger view, You will be able to view registers, single-step through the application and the like.
+*Please* note, in order to use this, you have to reopen the example directory in a new VSCode Window:
+`File` -> `New Window` -> `File` -> `Open Folder`.
+Only then You will have the possibility to start this debugger using `F5` or in VSCode's Command Pallette
+(get there using CTRL+SHIFT+P or on MacOS Cmd+Shift+P) and type Debug.
+The VSCode extension Cortex-Debug will start an `openocd` server, which attaches to the RPI DebugProbe over USB.
+Then, the extension will start a `riscv32-unknown-elf-gdb` which loads the CMake Target binary (the target with extension .elf) and
+attaches to the `openocd` server and will issue gdb commands, such as `break main`.
+In the opening debugger view, You will be able to view registers (left-hand pane under "Local Variables"), single-step through
+the application (top-most buttons and arrows) and the like.
 
 ## GDB using OpenOCD (for reference)
 OpenOCD allows connecting to the RPI's DebugProbe Hardware (which itselve is just a PICO with a RP2040) over USB. This DebugProbe is attached to
