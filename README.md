@@ -1,4 +1,7 @@
 # Software Repository for Lecture Computerarchitektur
+This repository contains example code for Waveshare RP2350 LCD-1.28 employing RISC-V and best practices
+with regard to usage with Visual Studio code, CMake and debugging (on top of OpenOCD and GDB).
+Please follow this README closely, so that all platform tools are installed.
 
 ## Getting started
 
@@ -65,7 +68,7 @@ A compiler like `gcc` translates source code into binary form on Your host syste
 that is one translating to the RISC-V CPU architecture (in particular *RISC-V 32Bit*), running inside your host Operating System (Windows, MacOS or Linux).
 
 1. Download the [EmbeCOSM RISC-V Embedded stable Cross-compiler with GCC](https://embecosm.com/downloads/tool-chain-downloads/#risc-v-embedded-stable-release-compilers).
-Inside of our project's `external` directory, you may unpack this compiler into a `usr` directory, which we will
+Inside of our project's `external` directory, you may unpack this compiler into the below `external/usr` directory, which we will
 install our host-tools picotool, too.
 
 2. Install the compiler by unpacking it and rename this to a new `external/usr/` directory name. Here for an Ubuntu Linux System:
@@ -134,13 +137,13 @@ cd 01_flash_leds
 cmake -G Ninja -BBUILD .
 cmake --build BUILD
 ```
-
+Please note, that the Visual Studio Code extension "CMake Tools" will build into a directory called `build` (aka all lower-case).
 This will create an executable (using the gcc compiler and linker) and the `.uf2` file (using the picotool):
 ```
 ls -al ./BUILD/src/01_flash_all_leds.uf2
 ```
 
-By _pressing_ the BOOT *and* RELEASE Button and letting go the RELEASE button _first_, the WaveShare will go into USB-Flash mode:
+By _pressing_ the BOOT *and* RELEASE Button and letting go the RELEASE button _first_, the RP2350 will go into USB-Flash mode:
 You may now copy this `.uf2` file onto the newly attached USB-Volume RP2350.
 You may do so by drag-and-drop using the File Explorer, or copy it using the Shell, e.g. on MacOS:
 ```
@@ -154,17 +157,23 @@ to set in `CMakeLists.txt`
 and then attaching a UART-program (like minicom) to the serial interface, showing the output of `stdout`.
 
 Better alternatives are real debuggers. Listed in terms of diminishing convenience
-- Segger IDE: This interactive IDE features a debugger, which will also use the JTAG/SWD Interface exposed using RPI's DebugProbe Hardware
-- VScode using Plattform IO: The Platform IO extension offers a interative debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project.
+- Segger IDE: This interactive IDE features a debugger, which will also use the JTAG/SWD Interface exposed using RPI's DebugProbe hardware. We will __not__ use this.
+- VScode using Plattform IO: The Platform IO extension offers a interactive debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project. We will __not__ use this extension for now.
+- VScode using Extension "Cortex-Debug": This extension offers a interactive debugger within VScode. It just requires 3 setup files `tasks.json` with `settings.json` for building the project and `launch.json` to launch and attach the `gdb` debugger to the RPI DebugProbe.
 - GDB using OpenOCD: Running the GNU Debugger on the console.
 
 ## Segger IDE
-We will not use this for now
+We will not use this for now.
 
-## VSCode using Plattform IO:
-XXX
+## VSCode using Plattform IO
+We will not use this for now.
 
-## GDB using OpenOCD
+## VSCode using Cortex-Debug
+The VSCode extension Cortex-Debug will create an `openocd` server, which attaches to the RPI DebugProbe over USB.
+Then, the extension will start a `riscv32-unknown-elf-gdb` which attaches to the `openocd` server and will issue gdb commands, such as `break main`.
+In the opening debugger view, You will be able to view registers, single-step through the application and the like.
+
+## GDB using OpenOCD (for reference)
 OpenOCD allows connecting to the RPI's DebugProbe Hardware (which itselve is just a PICO with a RP2040) over USB. This DebugProbe is attached to
 WaveShare's SWCLK and SWDIO pins (as well as GND!).
 OpenOCD when started detects the DebugProbe Hardware:

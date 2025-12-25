@@ -1,0 +1,32 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug RP2350 (RiscV)",
+            "type": "cortex-debug",
+            "request": "launch",
+            // This needs to be adapted to the BUILD directory and the target
+            "executable": "${command:cmake.launchTargetPath}",
+            // "executable": "build/src/00_function_asm.elf",
+            "cwd": "${workspaceRoot}",
+            "servertype": "openocd",
+            "serverpath": "${workspaceRoot}/../external/usr/bin/openocd",
+            "gdbPath": "${workspaceRoot}/../external/usr/bin/riscv32-unknown-elf-gdb",
+            // Target device identifier
+            "device": "rp2350-riscv",
+            "configFiles": [
+                "interface/cmsis-dap.cfg",
+                "target/rp2350-riscv.cfg"
+            ],
+            "svdFile": "${workspaceRoot}/../external/pico-sdk/src/rp2350/hardware_regs/RP2350.svd",
+            "openOCDPreConfigLaunchCommands": [
+                "set ENABLE_RESCUE 0",
+                "set PICO_CORE riscv"
+            ],
+            "openOCDLaunchCommands": [
+                "adapter speed 5000"
+            ],
+            "runToEntryPoint": "main"
+        }
+    ]
+}
