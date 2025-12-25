@@ -5,14 +5,11 @@
             "name": "Debug RP2350 (RiscV)",
             "type": "cortex-debug",
             "request": "launch",
-            // This needs to be adapted to the BUILD directory and the target
             "executable": "${command:cmake.launchTargetPath}",
-            // "executable": "build/src/00_function_asm.elf",
             "cwd": "${workspaceRoot}",
             "servertype": "openocd",
             "serverpath": "${workspaceRoot}/../external/usr/bin/openocd",
             "gdbPath": "${workspaceRoot}/../external/usr/bin/riscv32-unknown-elf-gdb",
-            // Target device identifier
             "device": "rp2350-riscv",
             "configFiles": [
                 "interface/cmsis-dap.cfg",
