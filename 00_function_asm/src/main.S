@@ -18,13 +18,13 @@
         .attribute unaligned_access, 0                     # Do not allow unaligned memory access
         .attribute stack_align, 16                         # Stack Alignment to 16 Bytes (16 is the default)
 
-        # The C-compiler even adds a ".section" (below without dot)
-        # to specify a unique name, followed by flags here in colons,
+        # The C-compiler even adds a data .section
+        # followed by flags here in quotation marks,
         # followed by a @type (a specific constant)
-        # Our code us fine with the linker's defaults!
+        # This is somehow necessary, since a ".section data" does not lead the linker
+        # to properly load the address of "myString".
         # more https://sourceware.org/binutils/docs/as/Section.html
-        #   section data, "aMS", @progbits, 1              # Declaration of the data section: _a_llocatable, _M_ergeble, contains zero-terminated _S_trings
-        .section data
+        .section data, "aMS", @progbits, 1                 # Declaration of the data section: _a_llocatable, _M_ergeble, contains zero-terminated _S_trings
         .align  2                                          # Aligned to 2^2 Bytes (aka 4 Bytes)
 myString:                                                  # Label of the following String "myString" as local symbol
         .string "Test Assembler"                           # NUL-terminated String -- sometimes as also with GAS directory .asciiz
@@ -49,7 +49,7 @@ main:                                                      # The location of the
         mulhu a5, a2, a2                                   # Multiple high unsigned: interpret the multiplication as unsigned (same as above since 65535 > 0!)
 
         # 2. An example on how to call functions
-        lui     a0, %hi(myString)                          # Load the upper-immediate 20 Bits of the address of Symbol "LmyString"
+        lui     a0, %hi(myString)                          # Load the upper-immediate 20 Bits of the address of Symbol "myString"
         addi    a0, a0, %lo(myString)                      # Add to that the lower 20 Bits of the address
         jal     my_strlen                                  # Jump-and-Link to function my_strlen
 
