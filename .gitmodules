@@ -7,3 +7,7 @@
 [submodule "external/openocd"]
 	path = external/openocd
 	url = https://github.com/hpcraink/openocd.git
+[submodule "external/lvgl"]
+	path = external/lvgl
+	url = https://github.com/lvgl/lvgl.git
+	tag = release/v9.4
