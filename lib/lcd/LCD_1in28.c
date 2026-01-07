@@ -26,13 +26,13 @@ parameter:
 ******************************************************************************/
 static void LCD_1IN28_Reset(void)
 {
-    DEV_Digital_Write(LCD_RST_PIN, 1);
-    DEV_Delay_ms(100);
-    DEV_Digital_Write(LCD_RST_PIN, 0);
-    DEV_Delay_ms(100);
-    DEV_Digital_Write(LCD_RST_PIN, 1);
-    DEV_Digital_Write(LCD_CS_PIN, 0);
-    DEV_Delay_ms(100);
+    gpio_put(LCD_RST_PIN, 1);
+    sleep_ms(100);
+    gpio_put(LCD_RST_PIN, 0);
+    sleep_ms(100);
+    gpio_put(LCD_RST_PIN, 1);
+    gpio_put(LCD_CS_PIN, 0);
+    sleep_ms(100);
 }
 
 /******************************************************************************
@@ -42,10 +42,8 @@ parameter:
 ******************************************************************************/
 static void LCD_1IN28_SendCommand(UBYTE Reg)
 {
-    DEV_Digital_Write(LCD_DC_PIN, 0);
-    //DEV_Digital_Write(LCD_CS_PIN, 0);
+    gpio_put(LCD_DC_PIN, 0);
     DEV_SPI_WriteByte(Reg);
-    //DEV_Digital_Write(LCD_CS_PIN, 1);
 }
 
 /******************************************************************************
@@ -55,10 +53,8 @@ parameter:
 ******************************************************************************/
 static void LCD_1IN28_SendData_8Bit(UBYTE Data)
 {
-    DEV_Digital_Write(LCD_DC_PIN, 1);
-    //DEV_Digital_Write(LCD_CS_PIN, 0);
+    gpio_put(LCD_DC_PIN, 1);
     DEV_SPI_WriteByte(Data);
-    //DEV_Digital_Write(LCD_CS_PIN, 1);
 }
 
 /******************************************************************************
@@ -68,12 +64,9 @@ parameter:
 ******************************************************************************/
 static void LCD_1IN28_SendData_16Bit(UWORD Data)
 {
-    DEV_Digital_Write(LCD_DC_PIN, 1);
-    //DEV_Digital_Write(LCD_CS_PIN, 0);
+    gpio_put(LCD_DC_PIN, 1);
     DEV_SPI_WriteByte(Data >> 8);
     DEV_SPI_WriteByte(Data);
-   // DEV_Digital_Write(LCD_CS_PIN, 1);
-
 }
 
 /******************************************************************************
@@ -322,9 +315,9 @@ static void LCD_1IN28_InitReg(void)
     LCD_1IN28_SendCommand(0x21);
 
     LCD_1IN28_SendCommand(0x11);    // Sleep OUT
-    DEV_Delay_ms(120);
+    sleep_ms(120);
     LCD_1IN28_SendCommand(0x29);    // Display ON
-    DEV_Delay_ms(20);
+    sleep_ms(20);
 }
 
 /********************************************************************************
@@ -374,15 +367,16 @@ parameter:
 ********************************************************************************/
 void LCD_1IN28_Init(UBYTE Scan_dir)
 {
-    //Turn on the backlight
-    //DEV_SET_PWM(100);
-    //Hardware reset
+    // Turn on the backlight
+    DEV_SET_PWM(100);
+    
+    // Hardware reset
     LCD_1IN28_Reset();
 
-    //Set the resolution and scanning method of the screen
+    // Set the resolution and scanning method of the screen
     LCD_1IN28_SetAttributes(Scan_dir);
 
-    //Set the initialization register
+    // Set the initialization register
     LCD_1IN28_InitReg();
 }
 
@@ -391,27 +385,28 @@ function:    Sets the start position and size of the display area
 parameter:
         Xstart  :   X direction Start coordinates
         Ystart  :   Y direction Start coordinates
-        Xend    :   X direction end coordinates
-        Yend    :   Y direction end coordinates
+        Xend    :   X direction end coordinates (inclusive -- max. 239)
+        Yend    :   Y direction end coordinates (inclusive -- max. 239)
 ********************************************************************************/
 void LCD_1IN28_SetWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend)
 {
     // Column Address Set -- Set the X coordinates
     LCD_1IN28_SendCommand(0x2A);
-    LCD_1IN28_SendData_8Bit(0x00);		// high bit, always zero?
+    LCD_1IN28_SendData_8Bit(Xstart>>8);
     LCD_1IN28_SendData_8Bit(Xstart);
-    LCD_1IN28_SendData_8Bit((Xend-1)>>8);
-    LCD_1IN28_SendData_8Bit(Xend-1);
+    LCD_1IN28_SendData_8Bit(Xend>>8);
+    LCD_1IN28_SendData_8Bit(Xend);
 
     // Row Adress Set -- Set the Y coordinates
     LCD_1IN28_SendCommand(0x2B);
-    LCD_1IN28_SendData_8Bit(0x00);
+    LCD_1IN28_SendData_8Bit(Ystart>>8);
     LCD_1IN28_SendData_8Bit(Ystart);
-    LCD_1IN28_SendData_8Bit((Xend-1)>>8);
-    LCD_1IN28_SendData_8Bit(Yend-1);
+    LCD_1IN28_SendData_8Bit(Yend>>8);
+    LCD_1IN28_SendData_8Bit(Yend);
 
 	// Memory Write
     LCD_1IN28_SendCommand(0x2C);
+    gpio_put(LCD_DC_PIN, 1);
 }
 
 /******************************************************************************
@@ -428,8 +423,7 @@ void LCD_1IN28_Clear(UWORD Color)
     for (j = 0; j < LCD_1IN28_HEIGHT*LCD_1IN28_WIDTH; j++)
         Image[j] = Color;
 
-    LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH, LCD_1IN28_HEIGHT);
-    DEV_Digital_Write(LCD_DC_PIN, 1);
+    LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH-1, LCD_1IN28_HEIGHT-1);
     for(j = 0; j < LCD_1IN28_HEIGHT; j++)
         DEV_SPI_Write_nByte((uint8_t *)&Image[j*LCD_1IN28_WIDTH], LCD_1IN28_WIDTH*2);
 }
@@ -441,16 +435,14 @@ parameter:
 void LCD_1IN28_Display(UWORD *Image)
 {
     UWORD j;
-    LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH, LCD_1IN28_HEIGHT);
-    DEV_Digital_Write(LCD_DC_PIN, 1);
+    LCD_1IN28_SetWindows(0, 0, LCD_1IN28_WIDTH-1, LCD_1IN28_HEIGHT-1);
     for (j = 0; j < LCD_1IN28_HEIGHT; j++)
         DEV_SPI_Write_nByte((uint8_t *)&Image[j*LCD_1IN28_WIDTH], LCD_1IN28_WIDTH*2);
 }
 
 void LCD_1IN28_DisplayWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend, UWORD *Image)
 {
-    LCD_1IN28_SetWindows(Xstart, Ystart, Xend, Yend);
-    DEV_Digital_Write(LCD_DC_PIN, 1);
+    LCD_1IN28_SetWindows(Xstart, Ystart, Xend-1, Yend-1);
     for (int j = Ystart; j < Yend; j++) {
         int offset = Xstart + j * LCD_1IN28_WIDTH;
         DEV_SPI_Write_nByte((uint8_t *)&Image[offset], (Xend-Xstart)*2);
@@ -460,7 +452,7 @@ void LCD_1IN28_DisplayWindows(UWORD Xstart, UWORD Ystart, UWORD Xend, UWORD Yend
 
 void LCD_1IN28_DisplayPoint(UWORD X, UWORD Y, UWORD Color)
 {
-    LCD_1IN28_SetWindows(X, Y, X+1, Y+1);
+    LCD_1IN28_SetWindows(X, Y, X, Y);
     LCD_1IN28_SendData_16Bit(Color);
 }
 
