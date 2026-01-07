@@ -43,8 +43,7 @@
 #define UWORD uint16_t
 #define UDOUBLE uint32_t
 
-#define SPI_PORT spi1
-#define I2C_PORT i2c1
+#define IMU_I2C_PORT i2c1
 /**
  * GPIOI config
  **/
@@ -56,6 +55,8 @@
 #define LCD_RST_PIN 12
 #define LCD_BL_PIN 25
 
+#define LCD_SPI_PORT    (spi1)
+
 #define DEV_SDA_PIN     (6)
 #define DEV_SCL_PIN     (7)
 
@@ -64,13 +65,15 @@
 
 /*------------------------------------------------------------------------------------------------------*/
 
-void DEV_Digital_Write(uint16_t Pin, uint8_t Value);
-uint8_t DEV_Digital_Read(uint16_t Pin);
-
 void DEV_GPIO_Mode(uint16_t Pin, uint16_t Mode);
-void DEV_KEY_Config(uint16_t Pin);
-void DEV_Digital_Write(uint16_t Pin, uint8_t Value);
-uint8_t DEV_Digital_Read(uint16_t Pin);
+
+static inline void DEV_Digital_Write(uint16_t pin, uint8_t value) {
+    gpio_put(pin, value);
+}
+
+static inline uint8_t DEV_Digital_Read(uint16_t pin) {
+    return gpio_get(pin);
+}
 
 uint16_t DEC_ADC_Read(void);
 
@@ -85,7 +88,7 @@ void DEV_I2C_Write_nByte(uint8_t addr, uint8_t *pData, uint32_t Len);
 void DEV_I2C_Write_Register(uint8_t addr,uint8_t reg, uint16_t value);
 
 uint8_t DEV_I2C_Read_Byte(uint8_t addr, uint8_t reg);
-void DEV_I2C_Read_Register(uint8_t addr,uint8_t reg, uint16_t *value);
+void DEV_I2C_Read_Register(uint8_t addr, uint8_t reg, uint16_t *value);
 void DEV_I2C_Read_nByte(uint8_t addr, uint8_t reg, uint8_t *pData, uint32_t Len);
 
 void DEV_SET_PWM(uint8_t Value);
