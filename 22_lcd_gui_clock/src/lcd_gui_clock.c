@@ -37,7 +37,6 @@ void init_lcd_gui(uint16_t ** screen) {
     assert (NULL != screen);
 
     LCD_1IN28_Init(HORIZONTAL);
-    DEV_SET_PWM(60); // Required to get the Display to work
 
     /* Creating a full-sized image -- each Pixel has 2 Bytes*/
     image = malloc (LCD_1IN28_WIDTH * LCD_1IN28_HEIGHT * 2);
@@ -191,7 +190,7 @@ int main() {
         }
 
         LCD_1IN28_Display(screen);
-        DEV_Delay_ms(100);
+        sleep_ms(100);
     }
 
     DEV_Module_Exit();
