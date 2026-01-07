@@ -7,7 +7,7 @@ Please follow this README closely, so that all platform tools are installed.
 
 Clone this repository using the command
 ```
-git clone --recurse https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_arm.git
+git clone --recurse-submodules --shallow-submodules https://gitlab.hs-esslingen.de/rakeller/computerarchitektur_arm.git
 ```
 
 In order to also get the latest of the required sub-projects (among them pico-sdk and picotool),
@@ -169,13 +169,16 @@ Better alternatives are real debuggers. Listed in terms of diminishing convenien
 - Segger IDE: This interactive IDE features a debugger, which will also use the JTAG/SWD Interface exposed using RPI's DebugProbe hardware. We will __not__ use this.
 - VScode using Plattform IO: The Platform IO extension offers a interactive debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project. We will __not__ use this extension for now.
 - VScode using Extension "Cortex-Debug": This extension offers a interactive debugger within VScode. It just requires 3 setup files `tasks.json` with `settings.json` for building the project and `launch.json` to launch and attach the `gdb` debugger to the RPI DebugProbe.
-- GDB using OpenOCD: Running the GNU Debugger on the console.
+- GDB using OpenOCD: Running the GNU Debugger on the console. This may look awkward at first, but is a very handy tool. 
+
 
 ## Segger IDE
 We will not use this for now.
 
+
 ## VSCode using Plattform IO
 We will not use this for now.
+
 
 ## VSCode using Cortex-Debug
 *Please* note, in order to use this, you have to reopen the example directory in a new VSCode Window:
@@ -233,21 +236,25 @@ Most often, we execute these commands from the `BUILD` directory (hence the `src
 And most often, we want the code to break on the `main` function.
 We may supply gdb with these commands upon startup:
 ```
-riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf --ex "target extended-remote localhost:3333" --ex "dir $PWD/../src" --ex "break main"
+riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf --ex "target extended-remote localhost:3333" --ex "break main"
 ```
 
 ## GDB commands
 GDB is very powerful using the command line:
 1. Setting Breakpoints
-    1. `break main`  sets a breakpoint on function main
-    2. `break LINE_NUMER` 
+    1. `break main` sets a breakpoint on function main
+    2. `break LINE_NUMBER` sets a breakpoint on said line. One may combine with file-name and line: `break FILE.C:LINE_NUMBER`
+    3. `break *0x12345` sets a breakpoint on said address, like when disassembling the source (see `disas` below).
+    4. `del 1` removes the breakpoint number one -- as the hardware may only support 5 breakpoints, one may need to shuffle around
 2. Execution
-    1. `run` starts the execution from the beginning
-    2. `cont` continues until the next breakpoint (or until an error)
-    3. `finish` finished this function, returning to the caller
+    1. `run` starts the execution from the beginning (make sure to set a break-point prior)
+    2. `step` and `next`: step for one (source code) line even into function calls (see `finish`), next executes over function calls.
+    3. `cont` continues until the next breakpoint (or until an error)
+    4. `finish` finished this function, returning to the caller
 3. Displaying
     1. `print VAR` printing variables
     2. `info reg` Show all registers
     3. `info reg a0 t0 s0` Show values of these three specific registers
     4. `x/16 0x40000` Show memory values, here 16 Bytes at address 0x40000
+    5. `disas` disassembles the current function, 
 For all above commands, there is help available using `help COMMAND`.
