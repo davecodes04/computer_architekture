@@ -4,7 +4,7 @@ however it is implemented in RISC-V Assembler (for RP2350A).
 It shows the best practices on how to code for RISC-V Assembler
 using the GNU as Assembler (or short gas), including how to
 specify the RISC-V processor architecture (in order to allow
-shorter instructions like the 'zbs' extension), or how to
+shorter instructions like the `zbs` extension), or how to
 specify arrays, how to call functions etc.
 
 It does *not* need the Pico-SDK per se, other than for linking

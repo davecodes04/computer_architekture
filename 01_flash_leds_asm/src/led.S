@@ -1,10 +1,13 @@
-/** \file led.S
+/**
+ * \file led.S
  * \brief Functions to handle LEDs connected to GPIOs using SIO
  *
  * These model the way, the Pico-SDK initialized a GPIO for
  * Single-Cycle IO (SIO) following the hardware definitions in
  * the various HW-definition files (most importantly the CMSIS),
  * as well as their interaction with he IO banks in a PAD.
+ *
+ * Author: Rainer Keller, HS-Esslingen
  */
 
 /**
@@ -83,7 +86,7 @@ led_init:
 
         # Now gpio_set_dir(gpio, GPIO_OUT);
         lui     a4, %hi(SIO_BASE)                          # Load base address of Single-Cycle IO -- no need to addi %lo, since it's zero
-        bset    a3, zero, a0                               # Set the bit mask a3=(1<<gpio)
+        bset    a3, zero, a0                               # Set the bit mask a3 = (1<<gpio)
         sw      a3, GPIO_OE_SET(a4)                        # sio_hw->gpio_oe_set = mask;
 .led_init_out:
         ret
@@ -103,7 +106,7 @@ led_on:
         li      t0, NUM_BANK0_GPIOS                        # Get the number of GPIOs in Bank0 (in RP2350A, it's just one bank)
         bge     a0, t0, .led_on_out                        # and jump out if the gpio parameter is bigger
 
-        bset    a1, zero, a0                               # Set the bit mask a3 = (1 << gpio)
+        bset    a1, zero, a0                               # Set the bit mask a1 = (1 << gpio)
         lui     a2, %hi(SIO_BASE)                          # Load the base address of SIO_BASE, no need to addi since lower 12 bits are 0
         sw      a1, GPIO_OUT_SET(a2)                       # Set the Bit of the in sio_hw->gpio_set
 .led_on_out:
@@ -124,7 +127,7 @@ led_off:
         li      t0, NUM_BANK0_GPIOS                        # Get the number of GPIOs in Bank0 (in RP2350A, it's just one bank)
         bge     a0, t0, .led_off_out                       # and jump out if the gpio parameter is bigger
 
-        bset    a1, zero, a0                               # Set the bit mask a3 = (1 << gpio)
+        bset    a1, zero, a0                               # Set the bit mask a1 = (1 << gpio)
         lui     a2, %hi(SIO_BASE)                          # Load the base address of SIO_BASE, no need to addi since lower 12 bits are 0
         sw      a1, GPIO_OUT_CLR(a2)                       # Set the Bit of the in sio_hw->gpio_clr
 .led_off_out:
