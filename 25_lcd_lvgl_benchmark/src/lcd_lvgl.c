@@ -294,12 +294,6 @@ static lv_obj_t * widgets_init(void) {
     lv_table_set_cell_value(table, 4, 1, "0");
     lv_table_set_cell_value(table, 5, 1, "0");
 
-    lv_table_set_cell_ctrl(table, 0, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_ctrl(table, 1, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_ctrl(table, 2, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_ctrl(table, 3, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_ctrl(table, 4, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
-    lv_table_set_cell_ctrl(table, 5, 1, LV_TABLE_CELL_CTRL_TEXT_CROP);
     lv_table_set_column_width(table, 0, 100);
     lv_table_set_column_width(table, 1, 100);
     
@@ -312,10 +306,9 @@ static lv_obj_t * widgets_init(void) {
     lv_obj_set_y(table, 15);
     lv_obj_set_scrollbar_mode(table, LV_SCROLLBAR_MODE_OFF);
 
-    /* Change the style of the Cells(!) (here LV_PART_ITEMS), the padding, border-width and margin where too wide */
-    lv_style_t table_style;
+    /* IMPORTANT: Change the style of the Cells(!) (here LV_PART_ITEMS), the padding, border-width and margin where too wide */
+    static lv_style_t table_style; // IMRORTANT: This needs to be static, otherwise the dimensions change, when redrawing the table.
     lv_style_init(&table_style);
-    // lv_style_set_height(&table_style, LV_SIZE_CONTENT);
     lv_style_set_pad_all(&table_style, 2);
     lv_style_set_border_width(&table_style, 1);
     lv_style_set_margin_all(&table_style, 3);
