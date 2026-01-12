@@ -13,7 +13,9 @@ git clone --recurse-submodules --shallow-submodules https://gitlab.hs-esslingen.
 In order to also get the latest of the required sub-projects (among them pico-sdk and picotool),
 afterwards recursively checkout these sub-modules:
 ```
-git -c submodule."lib/mbedtls".update=none submodule update --init --recursive
+git -c submodule."lib/mbedtls".update=none submodule update --init --remote --recursive --recommend-shallow
+or
+git submodule update --init --remote --recommend-shallow
 ```
 
 This will populate the sub-directory `external`.
@@ -41,8 +43,8 @@ sudo apt -y gcc g++ make ninja
 
 ## MacOS Users (others skip to the next step)
 For developing on MacOS, you need to also get acquinted to the command line, the so-called "Terminal" program.
-By default it uses the Z-Shell (or short `zsh`), however, you should either switch to Bash altogether or just call `bash`
-prior to executing any scripts.
+By default it uses the Z-Shell (or short `zsh`), however, you should either switch to Bash altogether (please Google how to do that on MacOS)
+or just always call `bash` prior to executing any scripts.
 
 Packages are generally installed using the [Homebrew installer](https://brew.sh/). After installation of Homebrew, please add the
 following "formula":
@@ -52,7 +54,10 @@ brew install cmake gcc ninja
 
 Afterwards, you will be able to find the packages, all linked into a sub-directory under `/opt/homebrew/Cellar`.
 
-Like Windows-Users, you may want to install Minicom for serial terminal (COM-port) debugging.
+Like Windows-Users, you may want to install Minicom for serial terminal (COM-port) debugging:
+```
+brew install minicom
+```
 
 
 ## Linux Users (others skip to the next step)
@@ -62,7 +67,7 @@ Please also install packages listed under Windows Subsystem for Linux (WSL), so 
 sudo apt -y gcc g++ make ninja
 ```
 
-Like Windows-Users, you may want to install Minicom for serial terminal (COM-port) debugging.
+Like Windows and MacOS-Users, you may want to install Minicom for serial terminal (COM-port) debugging.
 
 
 ## Install the cross-compiler for Your operating system
@@ -87,12 +92,14 @@ cp -r /Volumes/riscv-embecosm-embedded-macos-20250309/riscv-embecosm-embedded-ma
 ```
 
 
-The Unix Shell needs to *find* this `gcc` cross-compiler, named `riscv32-unknown-elf-gcc`, i.e. it needs to be in the `PATH` environment variable.
-So *always* set it using:
+Please note: if You want to work from the *Shell* (or the Windows ```cmdline.exe```) instead of VS Code,
+this Unix Shell needs to *find* the `gcc` cross-compiler, named `riscv32-unknown-elf-gcc`,
+i.e. it needs to be in the `PATH` environment variable.
+You may set this using:
 ```
 export PATH=$PWD/usr/bin/:$PATH
 ```
-Only *then* will `which riscv32-unknown-elf-gcc` find this executable and hence `cmake` in the following step.
+Only *then* will `which riscv32-unknown-elf-gcc` find this executable and other executables (like `riscv32-unknown-elf-objdump`)
 
 
 ## Compile `pico-sdk` and `picotool`, as well as `openocd`
@@ -108,7 +115,7 @@ cd external/picotool
 # In case the BUILD directory already exists, remove it forcefully
 test -d BUILD && rm -fr BUILD
 # Configure with Generator Ninja (not Makefile), with a decent assumption of CMake-Version in Release mode, install into the existing usr-directory.
-cmake -G Ninja -BBUILD -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../usr -DPICO_SDK_PATH=$PWD/../pico-sdk/ .
+cmake -G Ninja -BBUILD -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/../usr -DPICO_SDK_PATH=$PWD/../pico-sdk/ .
 cmake --build BUILD
 cmake --install BUILD
 ```
@@ -123,7 +130,7 @@ cmake --install BUILD # Actually, this does nothing
 ```
 
 3. Finally build the `openocd` binary for connecting and using RPI's DebugProbe as Debugger HW. This software compiles using Autoconf and Automake,
-it needs to be called with configure prior to calling make. Pay attention to disable the "Warnings-as-Errors" flag for GCC:
+i.e. it needs to be called with configure prior to calling make. Pay attention to disable the "Warnings-as-Errors" flag for GCC:
 ```
 cd external/openocd
 test -d BUILD && rm -fr BUILD ; mkdir BUILD && cd BUILD
@@ -173,28 +180,19 @@ Better alternatives are real debuggers. Listed in terms of diminishing convenien
 
 
 ## Segger IDE
-We will not use this for now.
+We will not use this for now -- we will use VSCode using Cortex-Debug (see below).
 
 
 ## VSCode using Plattform IO
-We will not use this for now.
+We will not use this for now -- we will use VSCode using Cortex-Debug (see below).
 
-
-## VSCode using Cortex-Debug
-*Please* note, in order to use this, you have to reopen the example directory in a new VSCode Window:
-`File` -> `New Window` -> `File` -> `Open Folder`.
-Only then You will have the possibility to start this debugger using `F5` or in VSCode's Command Pallette
-(get there using CTRL+SHIFT+P or on MacOS Cmd+Shift+P) and type Debug.
-The VSCode extension Cortex-Debug will start an `openocd` server, which attaches to the RPI DebugProbe over USB.
-Then, the extension will start a `riscv32-unknown-elf-gdb` which loads the CMake Target binary (the target with extension .elf) and
-attaches to the `openocd` server and will issue gdb commands, such as `break main`.
-In the opening debugger view, You will be able to view registers (left-hand pane under "Local Variables"), single-step through
-the application (top-most buttons and arrows) and the like.
 
 ## GDB using OpenOCD (for reference)
-OpenOCD allows connecting to the RPI's DebugProbe Hardware (which itselve is just a PICO with a RP2040) over USB. This DebugProbe is attached to
-WaveShare's SWCLK and SWDIO pins (as well as GND!).
-OpenOCD when started detects the DebugProbe Hardware:
+We will use VSCode using Cortex-Debug, however it's good to know the background of tools employed.
+OpenOCD allows connecting to the RPI's DebugProbe HW (which itselve is just a PICO with a RP2040) over USB.
+This DebugProbe is attached to WaveShare's SWCLK and SWDIO pins (as well as GND!).
+The DebugProbe's red LED must be lit, otherwise do *reconnect* the DebugProbe by re-plugging the Micro-USB cable!
+OpenOCD when started detects the DebugProbe:
 ```
 openocd -s INSTALL_DIR/share/ -f interface/cmsis-dap.cfg -f target/rp2350-riscv.cfg -c "adapter speed 5000" -c "set USE_CORE 0" 
 ```
@@ -227,8 +225,8 @@ Now, one may start the debugger GDB (configured in the RISC-V toolchain):
 ```
 riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf
 ```
-where PROJECT_BINARY is the name of the output file.
-While we copied the UF2-File to the RP2350, the ELF-File is the actual executable, which GDB will analyse.
+where PROJECT_BINARY is the name of the output execuable in ELF-format analysed by GDB,
+while the file copied the RP2350 is of container format UF2 (created by `picotool`).
 
 All the commands however need to go to the DebugProbe, which will relay these to the RP2350.
 So we need to tell GDB to connect using `target extended-remote localhost:3333`.
@@ -238,6 +236,19 @@ We may supply gdb with these commands upon startup:
 ```
 riscv32-unknown-elf-gdb src/PROJECT_BINARY.elf --ex "target extended-remote localhost:3333" --ex "break main"
 ```
+
+## VSCode using Cortex-Debug
+*Please* note, in order to use this, you have to reopen the example directory in a new VSCode Window:
+`File` -> `New Window` -> `File` -> `Open Folder`.
+Only then You will have the possibility to start the Cortex-Debug extension's debugger using
+the left-hand RUN-AND-DEBUG Symbol using the "Debug RP2350 (RiscV)" target, or `F5` or in VSCode's Command Pallette
+(get there using CTRL+SHIFT+P or on MacOS Cmd+Shift+P) and type Debug.
+The VSCode extension Cortex-Debug will start an `openocd` server, which attaches to the RPI DebugProbe over USB.
+Then, the extension will start a `riscv32-unknown-elf-gdb` which loads the CMake Target binary (the target with extension .elf) and
+attaches to the `openocd` server and will issue gdb commands, such as `break main`.
+In the opening debugger view, You will be able to view registers (left-hand pane under "Local Variables"), single-step through
+the application (top-most buttons and arrows) and the like.
+
 
 ## GDB commands
 GDB is very powerful using the command line:
