@@ -50,7 +50,7 @@ main:                                                      # The location of the
 
         # 2. An example on how to call functions
         lui     a0, %hi(myString)                          # Load the upper-immediate 20 Bits of the address of Symbol "myString"
-        addi    a0, a0, %lo(myString)                      # Add to that the lower 20 Bits of the address
+        addi    a0, a0, %lo(myString)                      # Add to that the lower 12 Bits of the address
         jal     my_strlen                                  # Jump-and-Link to function my_strlen
 
         # 3. Restore the state: restore the return address (ra) register, and restore the stack pointer
