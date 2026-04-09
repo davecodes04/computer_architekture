@@ -11,6 +11,6 @@ Nothing special, there's no additional hardware on the breadboard.
 
 # Compilation
 Just do
-  cmake -G Ninja -BBUILD .
-  cmake --build BUILD
-  cp src/*.uf2 /Volumes/RP2350    # or wherever your RP2350 shows up
+  cmake -G Ninja -Bbuild .
+  cmake --build build
+  cp build/src/*.uf2 /Volumes/RP2350    # or wherever your RP2350 shows up

@@ -36,7 +36,7 @@ When launching WSL, you may require Administrator permissions, therefore start `
 2. Inside of WSL install several packages, some using the default package installer `apt` and one as SNAP package (as these are more uptodate):
 ```
 sudo snap cmake
-sudo apt -y gcc g++ make ninja
+sudo apt install -y gcc g++ make automake autoconf libtool pkg-config ninja-build
 ```
 
 3. Under Windows, you may want to install a Serial line monitor (reading from the COM ports) like 
@@ -49,7 +49,7 @@ or just always call `bash` prior to executing any scripts.
 Packages are generally installed using the [Homebrew installer](https://brew.sh/). After installation of Homebrew, please add the
 following "formula":
 ```
-brew install cmake gcc ninja
+brew install cmake gcc automake autoconf libtool pkgconf ninja
 ```
 
 Afterwards, you will be able to find the packages, all linked into a sub-directory under `/opt/homebrew/Cellar`.
@@ -64,7 +64,7 @@ brew install minicom
 Again, any scripts run within this lecture is based on Bash -- please take care, if You employ any other Shell (like `ash`).
 Please also install packages listed under Windows Subsystem for Linux (WSL), so for a Debian/Ubuntu package manager:
 ```
-sudo apt -y gcc g++ make ninja
+sudo apt install -y gcc g++ make automake autoconf libtool pkg-config ninja-build
 ```
 
 Like Windows and MacOS-Users, you may want to install Minicom for serial terminal (COM-port) debugging.
@@ -112,51 +112,57 @@ an executable on/for the host.
 1. Configure and compile the software `picotool` using the commands:
 ```
 cd external/picotool
-# In case the BUILD directory already exists, remove it forcefully
-test -d BUILD && rm -fr BUILD
+# In case the build directory already exists, remove it forcefully
+test -d build && rm -fr build
 # Configure with Generator Ninja (not Makefile), with a decent assumption of CMake-Version in Release mode, install into the existing usr-directory.
-cmake -G Ninja -BBUILD -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/../usr -DPICO_SDK_PATH=$PWD/../pico-sdk/ .
-cmake --build BUILD
-cmake --install BUILD
+cmake -G Ninja -Bbuild -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$PWD/../usr -DPICO_SDK_PATH=$PWD/../pico-sdk/ .
+cmake --build build
+cmake --install build
 ```
 
 2. Now build `pico-sdk` for the RP2350 microcontroller (using the RISC-V cores) for our WaveShare RP2350 LCD-1.28 board, using:
 ```
 cd external/pico-sdk
-test -d BUILD && rm -fr BUILD
-cmake -G Ninja -BBUILD -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DPICO_PLATFORM=rp2350-riscv -DPICO_BOARD=waveshare_rp2350_lcd_1.28 .
-cmake --build BUILD
-cmake --install BUILD # Actually, this does nothing
+test -d build && rm -fr build
+cmake -G Ninja -Bbuild -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DPICO_PLATFORM=rp2350-riscv -DPICO_BOARD=waveshare_rp2350_lcd_1.28 .
+cmake --build build
+cmake --install build # Actually, this does nothing
 ```
 
 3. Finally build the `openocd` binary for connecting and using RPI's DebugProbe as Debugger HW. This software compiles using Autoconf and Automake,
 i.e. it needs to be called with configure prior to calling make. Pay attention to disable the "Warnings-as-Errors" flag for GCC:
 ```
 cd external/openocd
-test -d BUILD && rm -fr BUILD ; mkdir BUILD && cd BUILD
-../configure --prefix=$PWD/../../usr --disable-werror
+test -d build && rm -fr build ; mkdir build && cd build
+../configure --prefix=$PWD/../../usr --disable-werror --enable-internal-jimtcl
 make
 make install
+```
+_Attentention_: In case the ```make``` step produces errors like ```build-aux/missing```, You have to install the ```autoconf```, ```automake``` and ```libtool``` packages -- after first trying to run ```autoreconf -f -i```. This reinstalls these missing Shell scripts. (Thanks to Mia Miebach)
+If the Host-compiler throws errors when building the internal JIMTCL library, then best reinstall the development package of JIMTCL on Your machine:
+```
+# On Linux: sudo apt install -y libjim-dev
+# On MacOS: brew install jimtcl
 ```
 
 # Compilation of projects from the command line
 Now You may compile the various projects, e.g. head to directory `01_flash_leds` and build this project:
 ```
 cd 01_flash_leds
-cmake -G Ninja -BBUILD .
-cmake --build BUILD
+cmake -G Ninja -Bbuild .
+cmake --build build
 ```
 Please note, that the Visual Studio Code extension "CMake Tools" will build into a directory called `build` (aka all lower-case).
 This will create an executable (using the gcc compiler and linker) and the `.uf2` file (using the picotool):
 ```
-ls -al ./BUILD/src/01_flash_all_leds.uf2
+ls -al ./build/src/01_flash_all_leds.uf2
 ```
 
 By _pressing_ the BOOT *and* RELEASE Button and letting go the RELEASE button _first_, the RP2350 will go into USB-Flash mode:
 You may now copy this `.uf2` file onto the newly attached USB-Volume RP2350.
 You may do so by drag-and-drop using the File Explorer, or copy it using the Shell, e.g. on MacOS:
 ```
-cp ./BUILD/src/01_flash_all_leds.uf2 /Volumes/RP2350/
+cp ./build/src/01_flash_all_leds.uf2 /Volumes/RP2350/
 ```
 
 # Compilation of projects from VSCode
@@ -230,7 +236,7 @@ while the file copied the RP2350 is of container format UF2 (created by `picotoo
 
 All the commands however need to go to the DebugProbe, which will relay these to the RP2350.
 So we need to tell GDB to connect using `target extended-remote localhost:3333`.
-Most often, we execute these commands from the `BUILD` directory (hence the `src/` prefix above).
+Most often, we execute these commands from the `build` directory (hence the `src/` prefix above).
 And most often, we want the code to break on the `main` function.
 We may supply gdb with these commands upon startup:
 ```
