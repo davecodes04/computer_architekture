@@ -2,6 +2,7 @@
 message(STATUS "Setting PICO Toolchain")
 set(PICO_PLATFORM "rp2350-riscv") # or "rp2350", which defaults to "rp2350-arm-s" -- we want RISC-V
 set(PICO_BOARD "waveshare_rp2350_lcd_1.28") # or "waveshare_rp2040_lcd_1.28"
+## set(PICO_COMMON_LANG_FLAGS "-march=rv32imac_zba_zbb_zbkb_zbs_zicsr_zifencei -mabi=ilp32")
 
 # cmake_path(SET PICOTOOL_FETCH_FROM_GIT_PATH "${CMAKE_CURRENT_LIST_DIR}/external/usr/")
 cmake_path(SET PICO_SDK_PATH "${CMAKE_CURRENT_LIST_DIR}/external/pico-sdk/")
