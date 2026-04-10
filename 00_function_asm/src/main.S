@@ -45,8 +45,9 @@ main:                                                      # The location of the
         mul   a1, a0, a0                                   # Multiply 65535 * 65535 into a1 ---> 4.294.836.225, aka fits into 32-bit
         li    a2, 65536                                    # This time load immediate, but here instead of 0xffff, one higher 0x10000 
         mul   a3, a2, a2                                   # Multiply 65536 * 65536 into a3 ---> will not fit into 32-Bits --> a3 = 0
-        mulh  a4, a2, a2                                   # Multiply but return the HIGH-bist into a4, aka we get the "overflown" 32-bit --> a4 = 1
+        mulh  a4, a2, a2                                   # Multiply but return the HIGH-bits into a4, aka we get the "overflown" 32-bit --> a4 = 1
         mulhu a5, a2, a2                                   # Multiple high unsigned: interpret the multiplication as unsigned (same as above since 65535 > 0!)
+        rem   a7, a2, a0                                   # Remainder of dividing 65536 by 65535
 
         # 2. An example on how to call functions
         lui     a0, %hi(myString)                          # Load the upper-immediate 20 Bits of the address of Symbol "myString"
