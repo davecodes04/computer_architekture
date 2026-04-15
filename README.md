@@ -14,32 +14,39 @@ In order to also get the latest of the required sub-projects (among them pico-sd
 afterwards recursively checkout these sub-modules:
 ```
 git -c submodule."lib/mbedtls".update=none submodule update --init --remote --recursive --recommend-shallow
-or
+# or
 git submodule update --init --remote --recommend-shallow
 ```
 
 This will populate the sub-directory `external`.
-This will also skip to include Pico-SDK's mbedtls implementation, as it has compile-time errors.
+This will also skip to include Pico-SDK's `mbedtls` implementation, as it may contain compile-time errors.
 (maybe this submodule is needed however to compile picotool)...
 
 *First*, we will run from the command line, later You may setup VSCode with extensions)
 
+
 ## Windows Users (others skip to the next step)
-On Windows, it's best to use Windows Subsystem for Linux (WSL) for compiling and configuration under Linux, and editing with Visual-Studio under Windows.
-1. Install and start it using the Windows command line cmd.exe:
-```
-wsl.exe --install
-wsl.exe --install Ubuntu-24.04
-```
-When launching WSL, you may require Administrator permissions, therefore start `cmd.exe` with Administrator rights.
+On Windows the usage of the (otherwise great environment for development) "Windows Subsystem for Linux" (WSL) 
+is not suggested, since:
+1. To export USB-devices (like the RP DebugProbe) into the WSL, you need to install additional applications (usbipd-win)
+2. The exposed USB-devices may or may not be automatically be made availabled to Your user (by `udevd`); however this isn't always configured in Microsoft's Ubuntu (WSL1, WSL2?)
+3. When the USB-device is re-plugged, the device needs to exported yet again.
 
-2. Inside of WSL install several packages, some using the default package installer `apt` and one as SNAP package (as these are more uptodate):
-```
-sudo snap cmake
-sudo apt install -y gcc g++ make automake autoconf libtool pkg-config ninja-build
-```
+The installation therefore is still a complex -- due to Windows' quirks (does not rely on WSL anymore, but still needs around 1GB of disk-space):
+1. Install the latest `cmake` from [CMake Download](https://cmake.org/download/) system-wide
+2. Make sure, Your Windows installation has Python installed: start a `cmd.exe` and invoke `python.exe` (you may exit again using `exit()`)
+3. Download the provided installation-ZIP (containing ninja-win.exe, a pre-compiled `picotool.exe`, `openocd.exe` and the pico-sdk plus cross-compilers) called
+[CA_Windows_external_usr.zip](https://www2.hs-esslingen.de/~rakeller/CA_Windows_external_usr.zip) -- this may need VPN.
+4. Extract this folder called `usr` into the `external` folder of the Git-Checkout.
+5. Add the directory `usr/bin` to Your `PATH` environment variable in Your user's Account settings (*hint*: use the Search-Bar in the settings, searching for `PATH`)
+6. After restarting Visual Studio Code (and having the VScode extensions described in the below section) the Build should find all tools (CMake, ninja, the cross-compiler), the Debug should invoke `openocd.exe` finding the DebugProbe and attach to `gdb.exe`
+7. Additionally, you may want to install a Terminal programm to retrieve the `printf`-like output from the USB as serial console.
 
-3. Under Windows, you may want to install a Serial line monitor (reading from the COM ports) like 
+*Attention*: In Your CMake-Build, i.e. when trying to actually compile, some parts is compiled using the C++ compiler. In two out of four Laptops by students,
+the C++ compiler failed, complaining `bits/c++config.h` is missing. Well it isn't.
+To make the C++ compiler find this GCC-internal header, in `config.cmake` set/adapt/uncomment the following line:
+```set(CMAKE_CXX_FLAGS "-IC:\\Users\\YOUR_USER_NAME\\YOUR_INSTALL_DIRECTORY\\computerarchitektur_arm\\external\\usr\\riscv32-unknown-elf\\include")```
+
 
 ## MacOS Users (others skip to the next step)
 For developing on MacOS, you need to also get acquinted to the command line, the so-called "Terminal" program.
@@ -70,7 +77,7 @@ sudo apt install -y gcc g++ make automake autoconf libtool pkg-config ninja-buil
 Like Windows and MacOS-Users, you may want to install Minicom for serial terminal (COM-port) debugging.
 
 
-## Install the cross-compiler for Your operating system
+## Install the cross-compiler for Your operating system (Linux & MacOS)
 A compiler like `gcc` translates source code into binary form on Your host system, i.e. regarding CPU and OS. We need a cross-compiler,
 that is one translating to the RISC-V CPU architecture (in particular *RISC-V 32Bit*), running inside your host Operating System (Windows, MacOS or Linux).
 
@@ -92,17 +99,18 @@ cp -r /Volumes/riscv-embecosm-embedded-macos-20250309/riscv-embecosm-embedded-ma
 ```
 
 
-Please note: if You want to work from the *Shell* (or the Windows ```cmdline.exe```) instead of VS Code,
+Please note: if You want to work from the *Shell* (or the Windows command line ```cmd.exe```) instead of VS Code,
 this Unix Shell needs to *find* the `gcc` cross-compiler, named `riscv32-unknown-elf-gcc`,
 i.e. it needs to be in the `PATH` environment variable.
 You may set this using:
 ```
 export PATH=$PWD/usr/bin/:$PATH
 ```
-Only *then* will `which riscv32-unknown-elf-gcc` find this executable and other executables (like `riscv32-unknown-elf-objdump`)
+Only *then* will `which riscv32-unknown-elf-gcc` find this executable and other executables (like `riscv32-unknown-elf-objdump`).
+You may want to put this `export PATH` into your Bash run command file `.bashrc` in your home directory to keep this definition.
 
 
-## Compile `pico-sdk` and `picotool`, as well as `openocd`
+## Compile `pico-sdk` and `picotool`, as well as `openocd` (Linux & MacOS)
 The Pico-SDK is the main Software Devolpment Kit by the Raspberry PI foundation. It's open source and like any Hardware Abstraction Layer (HAL), a very thin and light-weight layer on top of RP2040 and RP2350.
 
 Picotool allows interacting with RP2040 and RP2350, e.g. uploading files or converting the binary/hexadecimal executable
@@ -138,7 +146,7 @@ test -d build && rm -fr build ; mkdir build && cd build
 make
 make install
 ```
-_Attentention_: In case the ```make``` step produces errors like ```build-aux/missing```, You have to install the ```autoconf```, ```automake``` and ```libtool``` packages -- after first trying to run ```autoreconf -f -i```. This reinstalls these missing Shell scripts. (Thanks to Mia Miebach)
+_Attentention_: In case the `make` step produces errors like `build-aux/missing`, You have to install the `autoconf`, `automake` and `libtool` packages -- after first trying to run `autoreconf -f -i`. This reinstalls these missing Shell scripts. (Thanks to Mia Miebach)
 If the Host-compiler throws errors when building the internal JIMTCL library, then best reinstall the development package of JIMTCL on Your machine:
 ```
 # On Linux: sudo apt install -y libjim-dev
@@ -174,15 +182,14 @@ Editing and compiling from VSCode requires a few extensions. Please install the 
 
 # Debugging
 There's multiple ways to debug programs running on the RP2350. The dumbest of them all is `printf`-debugging, which requires
-to set in `CMakeLists.txt`
-```pico_enable_stdio_usb(executable_name 1)```
+to set ```pico_enable_stdio_usb(executable_name 1)``` in the `CMakeLists.txt` file
 and then attaching a UART-program (like minicom) to the serial interface, showing the output of `stdout`.
 
 Better alternatives are real debuggers. Listed in terms of diminishing convenience
 - Segger IDE: This interactive IDE features a debugger, which will also use the JTAG/SWD Interface exposed using RPI's DebugProbe hardware. We will __not__ use this.
-- VScode using Plattform IO: The Platform IO extension offers a interactive debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project. We will __not__ use this extension for now.
+- VScode using Plattform IO: The Platform IO extension offers a interactive debugger within VScode. This requires a bit of setup, e.g. adding a PIO file to the project. We will __not__ use this extension for now as Raspberry Microcontrollers are not supported natively (just by Git-forks).
 - VScode using Extension "Cortex-Debug": This extension offers a interactive debugger within VScode. It just requires 3 setup files `tasks.json` with `settings.json` for building the project and `launch.json` to launch and attach the `gdb` debugger to the RPI DebugProbe.
-- GDB using OpenOCD: Running the GNU Debugger on the console. This may look awkward at first, but is a very handy tool. 
+- GDB using OpenOCD: Running the GNU Debugger on the console. This may look awkward at first, but is a very handy tool when running in multiple terminal windows!
 
 
 ## Segger IDE
@@ -198,7 +205,7 @@ We will use VSCode using Cortex-Debug, however it's good to know the background 
 OpenOCD allows connecting to the RPI's DebugProbe HW (which itselve is just a PICO with a RP2040) over USB.
 This DebugProbe is attached to WaveShare's SWCLK and SWDIO pins (as well as GND!).
 The DebugProbe's red LED must be lit, otherwise do *reconnect* the DebugProbe by re-plugging the Micro-USB cable!
-OpenOCD when started detects the DebugProbe:
+When started, OpenOCD detects the DebugProbe:
 ```
 openocd -s INSTALL_DIR/share/ -f interface/cmsis-dap.cfg -f target/rp2350-riscv.cfg -c "adapter speed 5000" -c "set USE_CORE 0" 
 ```

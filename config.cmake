@@ -7,8 +7,12 @@ set(PICO_BOARD "waveshare_rp2350_lcd_1.28") # or "waveshare_rp2040_lcd_1.28"
 # cmake_path(SET PICOTOOL_FETCH_FROM_GIT_PATH "${CMAKE_CURRENT_LIST_DIR}/external/usr/")
 cmake_path(SET PICO_SDK_PATH "${CMAKE_CURRENT_LIST_DIR}/external/pico-sdk/")
 cmake_path(SET PICO_TOOLCHAIN_PATH "${CMAKE_CURRENT_LIST_DIR}/external/usr/bin/")
-# This is ugly, since PICOTOOL_EXECUTABLE does NOT work: just enlarge the PATH
+
+# This is ugly, since PICOTOOL_EXECUTABLE does NOT work: just enlarge the PATH; MAY NEED TO COMMENT
 set(ENV{PATH} "${CMAKE_CURRENT_LIST_DIR}/external/usr/bin/:$ENV{PATH}")
+# This is ugly: Sometimes on Windows, the C++ compiler "misses" headers from this directory; MAY NEED TO UNCOMMENT
+# set(CMAKE_CXX_FLAGS "-IC:\\Users\\YOUR_USER_NAME\\YOUR_INSTALL_DIRECTORY\\computerarchitektur_arm\\external\\usr\\riscv32-unknown-elf\\include")
+
 
 # To include a new LVGL-version, unpack in lib/, create a soft-link named lvgl and
 # create lv_conf.h in lvgl/ by copying from lv_conf_template.h
