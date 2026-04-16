@@ -1,7 +1,7 @@
 add_executable(${CMAKE_PROJECT_NAME} lcd_lvgl.c)
 
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ../../lib)
-target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib pico_time Config lcd lvgl hardware_dma)
+target_link_libraries(${CMAKE_PROJECT_NAME} pico_stdlib pico_time Config csr lcd lvgl hardware_dma)
 
 # Create map/bin/hex/uf2 file in addition to ELF.
 pico_add_extra_outputs(${CMAKE_PROJECT_NAME})
