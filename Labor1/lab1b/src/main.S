@@ -2,7 +2,7 @@
         .section .rodata                                   # ROM (Read-Only)
         .align 2                                           # Speicherausrichtung
 test_string:                                               # <-- Das ist dein Label (die Adresse)
-        .asciz "Hallo"                                     # .asciz legt den String an UND hängt automatisch die Null (NUL-Byte) an!
+        .asciz "Hallo.."                                     # .asciz legt den String an UND hängt automatisch die Null (NUL-Byte) an!
         
         .section .data                                     # RAM
         .align 2
@@ -22,14 +22,18 @@ main:                                                      # The location of the
 
         /** TODO: ADD YOUR OWN CODE */
         # Test string length
-        #la a0, test_string                                # Load the address of the string "Hallo" into register a0
-        #jal my_strlen                                     # Call the function my_strlen, which calculates the length of the string and returns it in register a0
+        la a0, test_string                                # Load the address of the string "Hallo" into register a0
+        jal my_strlen                                     # Call the function my_strlen, which calculates the length of the string and returns it in register a0
 
         # Test string copy
         la a0, dest_string                                 # load the address of the destination string into a0 
         la a1, test_string                                 # load the address of the string "Hallo" into a1
         jal my_strcpy                                      # call the function my_strcpy which copies the original string and returns it in the register a0
         # x/-5b $a0 in der debug console um um 5 Byte rückwärts an der Speicheradresse a0 zu gehen
+
+        # Test to lower
+        la      a0, dest_string                            # Übergib den Pointer zum RAM-String
+        jal     my_strtolower
 
 .main_loop:
         j       .main_loop                                 # Loop forever
