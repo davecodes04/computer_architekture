@@ -1,6 +1,7 @@
         .text
         .align 1
         .global my_strlen
+        .global my_strcpy
 /**
 * \fn my_strlen(const char *str);
 * \brief Calculate the length of a string
@@ -22,4 +23,15 @@ my_strlen:
 
 .strlen_end:
     mv a0, t0                               # move the length of the string to a0
+    ret
+
+my_strcpy:
+    lbu t0, 0(a1)
+    sb t0, 0(a0)
+    beqz t0, .my_strcpy_end
+    addi a0, a0, 1
+    addi a1, a1, 1
+    j my_strcpy
+    
+.my_strcpy_end:
     ret
