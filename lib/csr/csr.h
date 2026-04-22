@@ -36,11 +36,11 @@ static inline uint64_t cpu_rdinstret(void) {
      * gcc's way of specifying a register, memory is not touched, hence no
      * clobber of "memory"
      */
-    asm volatile ("asm_rdinstret_again:\n\t"
-                  "rdinstreth t0\n\t"          // Instead of letting the compiler choose,
-                  "rdinstret  %0\n\t"          // we use the temporary register t0.
-                  "rdinstreth %1\n\t"          // Hence, we need to mark it clobbered.
-                  "bne        t0, %1, asm_rdinstret_again\n\t"
+    asm volatile ("1:\n\t"                      // Declare a local symbol
+                  "rdinstreth t0\n\t"           // Instead of letting the compiler choose,
+                  "rdinstret  %0\n\t"           // we use the temporary register t0.
+                  "rdinstreth %1\n\t"           // Hence, we need to mark it clobbered.
+                  "bne        t0, %1, 1b\n\t"   // Repeat, if 2nd read of High does not match
                   : /* Output */"=r" (instr_l), "=r" (instr_h)
                   : /* No Input */
                   : /* Clobber */ "%t0");
@@ -55,11 +55,11 @@ static inline uint64_t cpu_rdinstret(void) {
  */
 static inline uint64_t cpu_rdcycles(void) {
     uint32_t cycles_l, cycles_h;
-    asm volatile ("asm_rdcycle_again:\n\t"
+    asm volatile ("1:\n\t"
                   "rdcycleh t0\n\t"
                   "rdcycle  %0\n\t"
                   "rdcycleh %1\n\t"
-                  "bne      t0, %1, asm_rdcycle_again\n\t"
+                  "bne      t0, %1, 1b\n\t"
                   : /* Output */"=r" (cycles_l), "=r" (cycles_h)
                   : /* No Input */
                   : /* Clobber */ "%t0");

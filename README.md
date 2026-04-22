@@ -22,6 +22,9 @@ This will populate the sub-directory `external`.
 This will also skip to include Pico-SDK's `mbedtls` implementation, as it may contain compile-time errors.
 (maybe this submodule is needed however to compile picotool)...
 
+*ATTENTION*: If Your (Windows PC) git command fails with "SSL certificate problem: unable to get local issuer certificate" (Lab PCs!!), turn off verification using the following command:
+```git config --global http.sslVerify false````
+
 *First*, we will run from the command line, later You may setup VSCode with extensions)
 
 
@@ -38,7 +41,7 @@ The installation therefore is still a complex -- due to Windows' quirks (does no
 3. Download the provided installation-ZIP (containing ninja-win.exe, a pre-compiled `picotool.exe`, `openocd.exe` and the pico-sdk plus cross-compilers) called
 [CA_Windows_external_usr.zip](https://www2.hs-esslingen.de/~rakeller/CA_Windows_external_usr.zip) -- this may need VPN.
 4. Extract this folder called `usr` into the `external` folder of the Git-Checkout.
-5. Add the directory `usr/bin` to Your `PATH` environment variable in Your user's Account settings (*hint*: use the Search-Bar in the settings, searching for `PATH`)
+5. Add the directory `usr/bin` to Your `PATH` environment variable in Your user's Account settings (*hint*: use the Search-Bar in the settings, searching for `PATH`, in German "Erweiterte Systemeinstellungen" --> "Umgebungsvariablen")
 6. After restarting Visual Studio Code (and having the VScode extensions described in the below section) the Build should find all tools (CMake, ninja, the cross-compiler), the Debug should invoke `openocd.exe` finding the DebugProbe and attach to `gdb.exe`
 7. Additionally, you may want to install a Terminal programm to retrieve the `printf`-like output from the USB as serial console.
 
