@@ -35,6 +35,29 @@ main:                                                      # The location of the
         la      a0, dest_string                            # Übergib den Pointer zum RAM-String
         jal     my_strtolower
 
+        # Test for hex to ASCII conversion
+        li      s2, 0                                      # Unser 16-Bit Zähler (s2) beginnt bei 0
+
+.test_loop:
+        # Parameter für hexToASCII übergeben
+        la      a0, dest_string   # Pointer auf den RAM-String
+        mv      a1, s2            # Zähler als Wert übergeben
+        jal     hexToASCII
+        
+        # HIER KANNST DU DEINEN BREAKPOINT SETZEN
+        # (Im Debugger prüfen: Ist dest_string korrekt?)                    
+
+        # Zähler um 1 erhöhen
+        addi    s2, s2, 1
+        
+        # Zähler auf 16-Bit begrenzen (0 bis 65535) - Rollover!
+        # 65535 ist hexadezimal 0xFFFF
+        lui     t0, 0x10          # Lade 0x10000 in t0
+        addi    t0, t0, -1        # t0 ist jetzt 0xFFFF (Die Maske für 16 Bit)
+        and     s2, s2, t0        # Zähler mit Maske abschneiden
+
+        j       .test_loop        # Unendliche Testschleife
+
 .main_loop:
         j       .main_loop                                 # Loop forever
 
