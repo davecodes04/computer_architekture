@@ -7,13 +7,12 @@
 * \fn my_strlen(const char *str);
 * \brief Calculate the length of a string
 *
-* \param[in] str The string to calculate the length of
+* \param[in] a0 pointer to the NUL terminated string
 * \return The length of the string
 * \note Modified registers: t0, t1, a0
 */
 my_strlen:
-    li t0, 0                                # Initialize the length counter (t0) to 0
-    j .strlen_loop                          # jump to the actual loop
+    li t0, 0                                # initialize length counter
 
 .strlen_loop:
     lbu t1, 0(a0)                           # Load the next byte of the string into t1
@@ -27,12 +26,13 @@ my_strlen:
     ret
 
 /**
-* \fn my_strcpy(const char *str);
-* \brief Calculate the length of a string
+* \fn my_strcpy(char *dest, const char *src);
+* \brief Copies the string from the source to the destination
 *
-* \param[in] str The string to calculate the length of
-* \return The length of the string
-* \note Modified registers: t0, t1, a0
+* \param[in] a0 pointer to the destination buffer
+* \param[in] a1 pointer to the source string
+* \return void
+* \note Modified registers: t0, a0, a1
 */
 my_strcpy:
     lbu t0, 0(a1)                           # load first Byte from a0 to t0
@@ -54,30 +54,26 @@ my_strcpy:
  * \note Modified registers: t0, t1, t2, t3, a0
  */
 my_strtolower:
-        li      t0, 0                       # Längenzähler auf 0 setzen
-        li      t2, 65                      # ASCII-Wert für 'A' (Untergrenze) in t2
-        li      t3, 90                      # ASCII-Wert für 'Z' (Obergrenze) in t3
+        li      t0, 0                       # initialize length counter
+        li      t2, 65                      # ASCII value for 'A' 
+        li      t3, 90                      # ASCII value for 'Z'
 
 .strtolower_loop:
-        lbu     t1, 0(a0)                   # Lade das aktuelle Zeichen (Byte) in t1
-        beqz    t1, .strtolower_end         # Wenn das Zeichen NUL (0) ist, sind wir am Ende
+        lbu     t1, 0(a0)                   # load current character byte from the string
+        beqz    t1, .strtolower_end         # branch if NUL terminator is hit
 
-        # Ist das Zeichen ein Großbuchstabe? (Zwischen 65 und 90)
-        blt     t1, t2, .skip_convert       # Wenn kleiner als 65 ('A'), überspringen
-        bgt     t1, t3, .skip_convert       # Wenn größer als 90 ('Z'), überspringen
+        blt     t1, t2, .skip_convert       # if its less than 'A', skip
+        bgt     t1, t3, .skip_convert       # if its more than 'Z', skip
 
-        # Es ist ein Großbuchstabe! Umwandlung in Kleinbuchstabe:
-        # Wir addieren 32 (alternativ: ori t1, t1, 0x20)
-        addi    t1, t1, 32
+        addi    t1, t1, 32                  # add 32 so the uppercase is converted to lowercase
         
-        # Speichere das geänderte Zeichen zurück in den Arbeitsspeicher (RAM)
-        sb      t1, 0(a0)
+        sb      t1, 0(a0)                   # store the value in RAM
 
 .skip_convert:
-        addi    t0, t0, 1                   # Längenzähler um 1 erhöhen
-        addi    a0, a0, 1                   # Pointer um 1 verschieben (nächstes Zeichen)
-        j       .strtolower_loop            # Zurück zum Anfang der Schleife
+        addi    t0, t0, 1                   # increment string length counter
+        addi    a0, a0, 1                   # increment string pointer to look at the next character
+        j       .strtolower_loop            # loop
 
 .strtolower_end:                            # x/-7b $a0 if you set the breakpoint here then you can see the converted string
-        mv      a0, t0                      # Verschiebe die berechnete Länge nach a0 (Rückgabewert)
-        ret                                 # Zurück zur aufrufenden Funktion (main)
+        mv      a0, t0                      # move length into a0 as return value
+        ret
