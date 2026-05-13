@@ -35,12 +35,15 @@ main:                                                      # The location of the
         # Test to lower
         la      a0, dest_string                            # pointer to the RAM string stored in a0
         jal     my_strtolower
+        # x/s &dest_string
 
         # Test for hexToASCII conversion
-        li      s2, 0                                      # our 16 bit counter (s2) starts at 0
+        li      s2, 0                                      # our 16 bit counter (s2) starts at 0 # for test flip from 65553 to 0 set value to 65535
+        # x/s &dest_string
 
         # Test for decToASCII conversion
         la      a0, dest_string                            # pointer to the RAM string stored in a0
+        # x/s &dest_string
 
         # Test 1 dec
         li      a1, 256                                    # load 256 as first test case
