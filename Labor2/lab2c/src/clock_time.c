@@ -75,26 +75,28 @@ void clock_time_get_local(int * hour, int * minute, int * second) {
 
     /** @TODO: You may need to add/change logic */
 
-    *hour = (hours + timezone_offset_hours) % 24;
+    // add 24 for avoiding negative values when apply modulo 
+    *hour = (hours + timezone_offset_hours + 24 ) % 24;
     *minute = minutes;
     *second = seconds;
 }
 
 void clock_time_set_timezone(timezones_t tz) {
     assert (tz >= 0 && tz < TIMEZONE_COUNT);
-
     timezone_offset_hours = timezone_def[tz].hour_offset_UTC;
 }
 
 
 void clock_time_change_hour_utc(int change_value) {
-    assert (change_value >= 0 && change_value < 24);
-
+    // the change value is added onto hours
     hours += change_value;
+    // this is done so that no values larger than 24 can be present and so that the clock can also be set backwards
+    hours = ((hours % 24) + 24) % 24;
 }
 
 void clock_time_change_minute_utc(int change_value) {
-    assert (change_value >= 0 && change_value < 60);
-
+    // the change value is added onto hours
     minutes += change_value;
+    // this is done so that no values larger than 60 can be present and so that the clock can also be set backwards
+    minutes = ((minutes % 60) + 60) %60;
 }

@@ -9,7 +9,6 @@
 #include "lcd/LCD_1in28.h"
 #include "gui/gui.h"
 #include "math.h"
-
 #include "clock.h"
 #include "clock_cursor.h"
 #include "clock_gui.h"
@@ -25,6 +24,8 @@
  */
 #include "../images/watch_man.h"
 
+// selects if we want the 12 hour (1) or the 24 hour mode (0)
+#define SELECT12HOURS 1
 #define CURSOR_LEN  5
 
 // Main memory for drawing screen, registered to "gui"
@@ -147,6 +148,41 @@ void clock_gui_update(uint64_t tick_us)
 
     // The color of the to-be-edited hour / minute
     uint16_t color;
+
+// change to 12 hour mode if selected
+#if SELECT12HOURS == 1
+    // we technically still use the 24 hour format, but then % 12 it to get the correct values for this mode
+    int display_hours = hours % 12;
+    const char *am_pm;
+
+    // display 12 if it is currently 0
+    if (display_hours == 0) {
+        display_hours = 12;
+    }
+
+    // set AM or PM
+    if (hours < 12) {
+        am_pm = "AM";
+    }
+    else {
+        am_pm = "PM";
+    }
+    
+    // display the hours
+    color = (edit == CURSOR_EDIT_HOUR) ? BLUE : GREEN;
+    snprintf(time, sizeof(time), "%0d:", display_hours);
+    gui_draw_string(60, 180, time, &Font24, color, WHITE);
+
+    // display the minutes
+    color = (edit == CURSOR_EDIT_MINUTE) ? BLUE : GREEN;
+    snprintf(time, sizeof(time), "%0d", minutes);
+    gui_draw_string(100, 180, time, &Font24, color, WHITE);
+
+    // display AM/PM indicator
+    gui_draw_string(140, 180, am_pm, &Font24, color, WHITE);
+
+// change to 24 hour mode if selected
+#else 
     color = (edit == CURSOR_EDIT_HOUR) ? BLUE : GREEN;
     snprintf(time, sizeof(time), "%0d:", hours);
     gui_draw_string(80, 180, time, &Font24, color, WHITE);
@@ -154,6 +190,7 @@ void clock_gui_update(uint64_t tick_us)
     color = (edit == CURSOR_EDIT_MINUTE) ? BLUE : GREEN;
     snprintf(time, sizeof(time), "%0d", minutes);
     gui_draw_string(120, 180, time, &Font24, color, WHITE);
+#endif
 
     // Now draw the clock's hands
     hours_arr = hours * 8 + (minutes * 16) / 120;
